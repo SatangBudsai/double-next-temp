@@ -16,9 +16,12 @@ const Home = (props: Props) => {
   const [arrDate, setArrDate] = useState<Date[] | undefined>()
   const [rangeDate, setRangeDate] = useState<DateRange | undefined>()
 
+  const textContent = '<ul><li>มีเวลาเข้าเรียนภาคทฤษฎี ไม่น้อยกว่า 80%</li><li>ผ่านการสอบภาคทฤษฏี และปฎิบัติตามเกณฑ์</li><li>Complete Case Practice 2 Cases</li><li>Case Presentation &amp; Discussion 1 Case (Complete)</li></ul><p><strong>หมายเหตุ :</strong> ระยะเวลาการศึกษา ไม่รวมภาคปฎิบัติ ที่อาจต้องเพิ่มขึ้น สำหรับการให้การรักษาผู้ป่วยในบางราย</p>'
+
   return (
     <Fragment>
       <div className='flex flex-col gap-5'>
+        <div dangerouslySetInnerHTML={{ __html: textContent }} className='tagContent' />
         <div className='flex flex-wrap justify-center items-center gap-5'>
           Tempalte NextJs and NextUI
         </div>

@@ -21,4 +21,24 @@
   * {
     @apply border-divider;
   }
+
+  .tagContent ol,
+  .tagContent ul,
+  .tagContent menu {
+    list-style: disc;
+    margin: 0;
+    padding: 0;
+  }
+  .tagContent h1 {
+    @apply text-6xl;
+  }
+  .tagContent h2 {
+    @apply text-5xl;
+  }
+  .tagContent h3 {
+    @apply text-4xl;
+  }
+  .tagContent h4 {
+    @apply text-3xl;
+  }
 }

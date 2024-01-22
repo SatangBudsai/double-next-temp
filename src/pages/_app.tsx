@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { Fragment, ReactElement } from 'react';
 import '@/styles/globals.css'
 
 //SetUp Store redux
@@ -16,18 +16,20 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout || ((page: ReactElement) => page);
 
   return (
-    <ReactQueryProvider>
-      <ReduxProvider store={store}>
-        <ThemeProvider>
-          <DateProvider>
-            <NprogressProvider>
-              <AuthProvider>
-                {getLayout(<Component {...pageProps} />)}
-              </AuthProvider>
-            </NprogressProvider>
-          </DateProvider>
-        </ThemeProvider>
-      </ReduxProvider>
-    </ReactQueryProvider>
+    <Fragment>
+      <ReactQueryProvider>
+        <ReduxProvider store={store}>
+          <ThemeProvider>
+            <DateProvider>
+              <NprogressProvider>
+                <AuthProvider>
+                  {getLayout(<Component {...pageProps} />)}
+                </AuthProvider>
+              </NprogressProvider>
+            </DateProvider>
+          </ThemeProvider>
+        </ReduxProvider>
+      </ReactQueryProvider>
+    </Fragment>
   )
 }

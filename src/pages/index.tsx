@@ -38,7 +38,7 @@ const Home = (props: Props) => {
             Alert.message({
               content: "Open Message",
               noButton: true,
-              color:'primary'
+              color: 'primary'
             })
           )}>
             Open Message

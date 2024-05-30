@@ -25,7 +25,11 @@ const Home = (props: Props) => {
 
   const getApi = async () => {
     loaderGlobal.start()
+    const newUser = {
+      code: 'John Doe'
+    }
     await apiClient.get('/users')
+    await apiClient.post('/users', newUser)
     await apiBase.get({ urlBase: 'https://randomuser.me', url: '/api' })
     loaderGlobal.stop()
   }

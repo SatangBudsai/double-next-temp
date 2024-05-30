@@ -11,6 +11,7 @@ import DatePicker from '@/components/date-picker'
 import DateMultiplePicker from '@/components/date-multiple-picker'
 import DateRangePicker from '@/components/date-range-picker'
 import dayjs from 'dayjs'
+import apiClient from '@/service/main-service'
 
 type Props = {}
 
@@ -24,6 +25,7 @@ const Home = (props: Props) => {
 
   const getApi = async () => {
     loaderGlobal.start()
+    await apiClient.get('/users')
     await apiBase.get({ urlBase: 'https://randomuser.me', url: '/api' })
     loaderGlobal.stop()
   }

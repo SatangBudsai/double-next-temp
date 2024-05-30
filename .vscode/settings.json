@@ -7,8 +7,6 @@
     ".env.*": "env"
   },
   "cSpell.words": [
-    "nextui",
-    "tailwindcss",
     "clsx",
     "hugeicons",
     "iconify",
@@ -17,6 +15,7 @@
     "reduxjs",
     "tailwindcss",
     "tanstack",
-    "usehooks"
+    "usehooks",
+    "Zodios"
   ]
 }

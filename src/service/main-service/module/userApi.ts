@@ -13,11 +13,19 @@ export const userApi = makeApi([
     path: '/users',
     parameters: [
       {
-        name: 'payload',
+        name: 'code',
         type: 'Body',
-        schema: z.object({
-          code: z.string()
-        })
+        schema: z.string()
+      },
+      {
+        name: 'code2',
+        type: 'Body',
+        schema: z.string()
+      },
+      {
+        name: 'testQuery',
+        type: 'Query',
+        schema: z.any()
       }
     ],
     response: z.any()

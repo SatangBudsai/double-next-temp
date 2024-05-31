@@ -1,7 +1,7 @@
 import Alert from '@/components/alert'
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
 import $ from 'jquery'
-import { apiBaseType } from './type'
+import { ApiType } from './type'
 
 const param = $.param
 const defaultURL = process.env.NEXT_PUBLIC_SERVICE
@@ -50,47 +50,47 @@ axiosBase.interceptors.response.use(
   }
 )
 
-const handleURL = (req: apiBaseType) => {
+const handleURL = (req: ApiType) => {
   const url = req.urlBase || defaultURL
   req.urlBase = url
 }
 
-const encodeURI = (req: apiBaseType) => {
+const encodeURI = (req: ApiType) => {
   const enCodeURI = encodeURIComponent(req.url).replace(/%2F/gi, '/')
   return `${req.urlBase}${enCodeURI}`
 }
 
-const apiBase = {
-  async get(req: apiBaseType) {
+const api = {
+  async get(req: ApiType) {
     handleURL(req)
     const res = await axiosBase.get(encodeURI(req), req.config)
     return res?.data
   },
 
-  async post(req: { data?: any } & apiBaseType) {
+  async post(req: { data?: any } & ApiType) {
     handleURL(req)
     const res = await axiosBase.post(encodeURI(req), req.data, req.config)
     return res?.data
   },
 
-  async put(req: { data?: any } & apiBaseType) {
+  async put(req: { data?: any } & ApiType) {
     handleURL(req)
     const res = await axiosBase.put(encodeURI(req), req.data, req.config)
     return res?.data
   },
 
-  async patch(req: { data?: any } & apiBaseType) {
+  async patch(req: { data?: any } & ApiType) {
     handleURL(req)
     const res = await axiosBase.patch(encodeURI(req), req.data, req.config)
     return res?.data
   },
 
-  async delete(req: apiBaseType) {
+  async delete(req: ApiType) {
     handleURL(req)
     const res = await axiosBase.delete(encodeURI(req), req.config)
     return res?.data
   }
 }
 
-export default apiBase
+export default api
 export { axios, param, axiosBase }

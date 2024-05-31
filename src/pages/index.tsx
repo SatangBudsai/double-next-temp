@@ -5,7 +5,7 @@ import MainLayout from '@/layouts/main-layout'
 import { DateRange } from 'react-day-picker'
 import Alert from '@/components/alert'
 import { Button, Input } from '@nextui-org/react'
-import apiBase from '@/api/base'
+import api from '@/api'
 import useLoaderGlobal from '@/hooks/useLoaderGlobal'
 import DatePicker from '@/components/date-picker'
 import DateMultiplePicker from '@/components/date-multiple-picker'
@@ -29,8 +29,7 @@ const Home = (props: Props) => {
       code: 'John Doe'
     }
     await apiClient.get('/users')
-    await apiClient.post('/users', newUser)
-    await apiBase.get({ urlBase: 'https://randomuser.me', url: '/api' })
+    await api.get({ urlBase: 'https://randomuser.me', url: '/api' })
     loaderGlobal.stop()
   }
 

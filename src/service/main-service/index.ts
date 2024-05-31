@@ -1,5 +1,5 @@
-import { Zodios, makeApi, ZodiosOptions } from '@zodios/core'
-import { userApi } from './userApi'
+import { Zodios, ZodiosOptions } from '@zodios/core'
+import { MakeApi } from './make-api'
 
 const baseURL = process.env.NEXT_PUBLIC_SERVICE
 if (!baseURL) {
@@ -15,8 +15,6 @@ const options: ZodiosOptions = {
   }
 }
 
-export const apiSchema = makeApi([...userApi])
-
-const apiClient = new Zodios(baseURL, apiSchema, options)
+const apiClient = new Zodios(baseURL, MakeApi, options)
 
 export default apiClient

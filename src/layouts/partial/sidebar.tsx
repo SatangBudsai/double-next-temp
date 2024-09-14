@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { Avatar, Button, ScrollShadow, Spacer, Tooltip } from '@nextui-org/react'
 import { cn } from '@/utils/cn'
 import SidebarMenu from './sidebar-menu'
-import { sectionItems } from './sidebar-items'
+import useSectionItems from './sidebar-items'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import configLayout from '@/layouts/config-layout.json'
 import { useTheme } from 'next-themes'
@@ -15,6 +15,7 @@ type Props = {
 }
 
 const Sidebar = (props: Props) => {
+  const sectionItems = useSectionItems()
   const appSettingState = useSelector((state: StateType) => state.appSettingState)
   const { isMobile } = useBreakpoint()
   const { setTheme, theme } = useTheme()
@@ -49,7 +50,7 @@ const Sidebar = (props: Props) => {
       </div>
 
       <ScrollShadow className='-mr-6 h-full max-h-full py-6 pr-6'>
-        <SidebarMenu isCompact={isCompact} items={sectionItems} />
+        <SidebarMenu isCompact={isCompact} items={sectionItems.data()} />
       </ScrollShadow>
 
       <Spacer y={2} />

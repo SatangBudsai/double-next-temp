@@ -16,14 +16,14 @@ type Props = {
 
 export default function MainLayout(props: Props) {
   const { isMobile } = useBreakpoint()
-  const heightSidebar = `h-[calc(100dvh-${configLayout.navbar.height})]`
+  const heightSidebar = `calc(100dvh - ${configLayout.navbar.height})`
 
   return (
     <div className='max-w-screen relative flex min-h-dvh flex-col'>
       <Navbar />
       <section className='flex flex-1'>
         {!isMobile && (
-          <Card radius='none' className={cn('sticky top-20 z-[39]', heightSidebar)}>
+          <Card radius='none' className={cn('sticky top-20 z-[39]')} style={{ height: heightSidebar }}>
             <Sidebar />
           </Card>
         )}

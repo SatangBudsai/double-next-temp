@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "env-cmd -f .env next dev -p 8080 --turbo",
-    "dev:local": "env-cmd -f .env.local next dev -p 8080 --turbo",
+    "dev": "env-cmd -f .env next dev -p 8080",
+    "dev:local": "env-cmd -f .env.local next dev -p 8080",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "preprocess-generated": "node ./src/api/generated/configs/pre-processor.js",
     "postprocess-generated": "node ./src/api/generated/configs/post-processor.js",
-    "generate": "yarn preprocess-generated && swagger-typescript-api -p ./src/api/generated/configs/swagger-processed.json -o ./src/api/generated/main-service -n apiGenerated.ts --axios --unwrap-response-data && yarn postprocess-generated"
+    "generate": "yarn swagger-typescript-api -p ./src/api/generated/configs/swagger-processed.json -o ./src/api/generated/main-service -n apiGenerated.ts --axios --unwrap-response-data && yarn postprocess-generated"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.2.2",
@@ -50,6 +50,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^1.6.1",
     "@types/jquery": "^3.5.29",
     "@types/node": "^20",
     "@types/nprogress": "^0.2.3",

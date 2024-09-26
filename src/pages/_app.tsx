@@ -15,6 +15,10 @@ import AuthGuard from '@/providers/auth'
 import RootLayout from '@/layouts/root-layout'
 import SocketProvider from '@/providers/socket'
 
+import 'swiper/css'
+import 'swiper/css/pagination'
+import 'swiper/css/navigation'
+
 import { Prompt } from 'next/font/google'
 const prompt = Prompt({
   subsets: ['latin', 'latin-ext', 'thai'],
@@ -31,22 +35,22 @@ export default function App({ Component, pageProps }: AppPropsWithLayoutType) {
     <Fragment>
       <ReactQueryProvider>
         <ReduxProvider store={store}>
-          <SocketProvider>
-            <NprogressProvider>
-              <NextUIProvider>
-                <DayjsProvider>
-                  <AuthGuard isAuth={auth}>
-                    <style jsx global>{`
-                      * {
-                        font-family: ${prompt.style.fontFamily};
-                      }
-                    `}</style>
-                    <RootLayout>{getLayout(<Component {...pageProps} />)}</RootLayout>
-                  </AuthGuard>
-                </DayjsProvider>
-              </NextUIProvider>
-            </NprogressProvider>
-          </SocketProvider>
+          {/* <SocketProvider> */}
+          <NprogressProvider>
+            <NextUIProvider>
+              <DayjsProvider>
+                <AuthGuard isAuth={auth}>
+                  <style jsx global>{`
+                    * {
+                      font-family: ${prompt.style.fontFamily};
+                    }
+                  `}</style>
+                  <RootLayout>{getLayout(<Component {...pageProps} />)}</RootLayout>
+                </AuthGuard>
+              </DayjsProvider>
+            </NextUIProvider>
+          </NprogressProvider>
+          {/* </SocketProvider> */}
         </ReduxProvider>
       </ReactQueryProvider>
     </Fragment>

@@ -10,7 +10,7 @@
     "lint": "next lint",
     "preprocess-generated": "node ./src/api/generated/configs/pre-processor.js",
     "postprocess-generated": "node ./src/api/generated/configs/post-processor.js",
-    "generate": "yarn swagger-typescript-api -p ./src/api/generated/configs/swagger-processed.json -o ./src/api/generated/main-service -n apiGenerated.ts --axios --unwrap-response-data && yarn postprocess-generated"
+    "generate": "yarn preprocess-generated && swagger-typescript-api -p ./src/api/generated/configs/swagger-processed.json -o ./src/api/generated/main-service -n apiGenerated.ts --axios --unwrap-response-data && yarn postprocess-generated"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.2.2",

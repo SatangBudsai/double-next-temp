@@ -12,16 +12,17 @@ import DateRangePicker from '@/components/date-range-picker'
 import exampleSubService from '@/api/manual/sub-service/example'
 import { Controller, useForm } from 'react-hook-form'
 import { SlideshowLightbox } from 'lightbox.js-react'
+import { useTranslation } from 'react-i18next'
 
 type Props = {}
 
 const Home = (props: Props) => {
   const loaderGlobal = useLoaderGlobal()
-
   const { theme, setTheme } = useTheme()
   const [date, setDate] = useState<Date | undefined>()
   const [arrDate, setArrDate] = useState<Date[] | undefined>()
   const [rangeDate, setRangeDate] = useState<DateRange | undefined>()
+  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'common' })
 
   const getApi = async () => {
     loaderGlobal.start()
@@ -88,6 +89,7 @@ const Home = (props: Props) => {
 
       <div className='flex flex-col gap-5'>
         <div className='flex flex-wrap items-center justify-center gap-5'>Template NextJs and NextUI</div>
+        <div className='flex justify-center'>{tCommon('hello')}</div>
 
         <Button variant='flat' color='primary' onClick={getApi}>
           Call API

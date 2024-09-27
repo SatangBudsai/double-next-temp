@@ -21,6 +21,7 @@ import 'swiper/css/navigation'
 
 import { initLightboxJS } from 'lightbox.js-react'
 import 'lightbox.js-react/dist/index.css'
+import '@/configs/i18n'
 
 import { Prompt } from 'next/font/google'
 const prompt = Prompt({

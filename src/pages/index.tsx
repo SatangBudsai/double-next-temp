@@ -4,13 +4,14 @@ import RootLayout from '@/layouts/root-layout'
 import MainLayout from '@/layouts/main-layout'
 import { DateRange } from 'react-day-picker'
 import Alert from '@/components/alert'
-import { Button, Input } from '@nextui-org/react'
+import { Button, Input, Image } from '@nextui-org/react'
 import useLoaderGlobal from '@/hooks/useLoaderGlobal'
 import DatePicker from '@/components/date-picker'
 import DateMultiplePicker from '@/components/date-multiple-picker'
 import DateRangePicker from '@/components/date-range-picker'
 import exampleSubService from '@/api/manual/sub-service/example'
 import { Controller, useForm } from 'react-hook-form'
+import { SlideshowLightbox } from 'lightbox.js-react'
 
 type Props = {}
 
@@ -28,8 +29,63 @@ const Home = (props: Props) => {
     loaderGlobal.stop()
   }
 
+  const productsCafe = [
+    {
+      id: 1,
+      name: 'Macarons',
+      href: '#',
+      imageSrc:
+        'https://images.pexels.com/photos/808941/pexels-photo-808941.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      imageAlt: 'Macarons',
+      price: '$6',
+      color: 'Black'
+    },
+    {
+      id: 2,
+      name: 'Pancakes',
+      href: '#',
+      imageSrc:
+        'https://images.pexels.com/photos/2280545/pexels-photo-2280545.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      imageAlt: 'Pancakes',
+      price: '$4',
+      color: 'White'
+    },
+    {
+      id: 3,
+      name: 'Macaron Box',
+      href: '#',
+      imageSrc:
+        'https://images.pexels.com/photos/1346345/pexels-photo-1346345.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+      imageAlt: 'Pink macarons.',
+      price: '$7',
+      color: 'Navy'
+    }
+  ]
+
   return (
     <Fragment>
+      <SlideshowLightbox
+        lightboxIdentifier='lbox1'
+        showThumbnails={true}
+        // framework='next'
+        images={productsCafe}
+        className='grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8'>
+        {productsCafe.map(product => (
+          <div key={product.id}>
+            <div className='aspect-w-1 aspect-h-1 xl:aspect-w-7 xl:aspect-h-8 h-48 overflow-hidden rounded-lg bg-gray-200'>
+              <Image
+                src={product.imageSrc}
+                alt={product.imageAlt}
+                data-lightboxjs='lbox1'
+                className='demoImg h-full w-full object-cover group-hover:opacity-75'
+              />
+            </div>
+            <h3 className='mt-4 text-sm text-gray-700'>{product.name}</h3>
+            <p className='mt-1 text-lg font-medium text-gray-900'>{product.price}</p>
+          </div>
+        ))}
+      </SlideshowLightbox>
+
       <div className='flex flex-col gap-5'>
         <div className='flex flex-wrap items-center justify-center gap-5'>Template NextJs and NextUI</div>
 
@@ -139,39 +195,6 @@ const Home = (props: Props) => {
           <Input type='email' label='Email' placeholder='Enter Email' variant='bordered' />
         </div>
       </div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
-      <div>z</div>
     </Fragment>
   )
 }

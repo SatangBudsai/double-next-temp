@@ -17,6 +17,8 @@
     "swiper",
     "tailwindcss",
     "tanstack",
-    "usehooks"
+    "usehooks",
+    "lightbox",
+    "lightboxjs"
   ]
 }

@@ -1,4 +1,4 @@
-import { Fragment, ReactElement } from 'react'
+import { Fragment, ReactElement, useEffect } from 'react'
 import '@/styles/globals.css'
 import dynamic from 'next/dynamic'
 
@@ -19,6 +19,9 @@ import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/navigation'
 
+import { initLightboxJS } from 'lightbox.js-react'
+import 'lightbox.js-react/dist/index.css'
+
 import { Prompt } from 'next/font/google'
 const prompt = Prompt({
   subsets: ['latin', 'latin-ext', 'thai'],
@@ -30,6 +33,10 @@ const prompt = Prompt({
 export default function App({ Component, pageProps }: AppPropsWithLayoutType) {
   const getLayout = Component.getLayout || ((page: ReactElement) => page)
   const auth = Component.auth ?? false
+
+  useEffect(() => {
+    initLightboxJS('4CE0-406C-E8EC-5F69', 'Individual')
+  })
 
   return (
     <Fragment>

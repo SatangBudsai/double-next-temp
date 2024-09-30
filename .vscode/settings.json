@@ -11,14 +11,15 @@
     "clsx",
     "hugeicons",
     "iconify",
+    "lightbox",
+    "lightboxjs",
+    "lucide",
     "nextui",
     "nprogress",
     "reduxjs",
     "swiper",
     "tailwindcss",
     "tanstack",
-    "usehooks",
-    "lightbox",
-    "lightboxjs"
+    "usehooks"
   ]
 }

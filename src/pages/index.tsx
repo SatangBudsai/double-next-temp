@@ -4,7 +4,7 @@ import RootLayout from '@/layouts/root-layout'
 import MainLayout from '@/layouts/main-layout'
 import { DateRange } from 'react-day-picker'
 import Alert from '@/components/alert'
-import { Button, Input, Image } from '@nextui-org/react'
+import { Button, Input, Image, Spacer } from '@nextui-org/react'
 import useLoaderGlobal from '@/hooks/useLoaderGlobal'
 import DatePicker from '@/components/date-picker'
 import DateMultiplePicker from '@/components/date-multiple-picker'
@@ -13,6 +13,7 @@ import exampleSubService from '@/api/manual/sub-service/example'
 import { Controller, useForm } from 'react-hook-form'
 import { SlideshowLightbox } from 'lightbox.js-react'
 import { useTranslation } from 'react-i18next'
+import UploadMultipleFile from '@/components/upload-multiple-file'
 
 type Props = {}
 
@@ -62,14 +63,29 @@ const Home = (props: Props) => {
       color: 'Navy'
     }
   ]
+  const [defaultFiles, setDefaultFiles] = useState<File[]>([])
+  const [uploadFiles, setUploadFiles] = useState<File[]>([])
 
   return (
     <Fragment>
+      <UploadMultipleFile
+        defaultFiles={[]}
+        onFilesUpload={files => setUploadFiles(files)}
+        dropzoneOptions={{
+          maxFiles: 10,
+          accept: {
+            'image/jpeg': [],
+            'image/png': []
+          }
+        }}
+      />
+      <Spacer y={5} />
+
       <SlideshowLightbox
         lightboxIdentifier='lbox1'
         showThumbnails={true}
-        // framework='next'
         images={productsCafe}
+        modalClose={'clickOutside'}
         className='grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8'>
         {productsCafe.map(product => (
           <div key={product.id}>

@@ -13,49 +13,55 @@ interface FileObject {
   [key: string]: any
 }
 
-interface UploadMultipleFileProps<T> extends DropzoneOptions {
-  defaultFiles?: T[]
-  maxFiles?: number
-  onFilesAccepted?: (files: File[]) => void
-  onFilesDeleted?: (deleteFile: T[]) => void
+interface UploadMultipleFileProps<T> {
+  defaultFiles: T[] | []
   srcImage?: (file: T) => string | undefined | null
   altImage?: (file: T) => string | undefined | null
-  className?: string
+  onFilesUpload?: (files: File[]) => void
+  onFilesDeleted?: (deleteFile: T[]) => void
+  dropzoneContent?: React.ReactNode
+  dropzoneClassName?: string
+  contentClassName?: string
+  dropzoneOptions?: DropzoneOptions
 }
 
 const UploadMultipleFile = <T extends FileObject>({
   defaultFiles = [],
-  maxFiles,
-  onFilesAccepted,
+  onFilesUpload,
   onFilesDeleted,
   srcImage = file => file?.src,
   altImage = file => file?.alt,
-  className,
-  ...dropzoneProps
+  dropzoneClassName,
+  contentClassName,
+  dropzoneContent,
+  dropzoneOptions
 }: UploadMultipleFileProps<T>) => {
   const [error, setError] = useState<string>('')
-  const [defaultList, setDefaultList] = useState<T[]>([])
+  const [initFiles, setInitFiles] = useState<T[]>([])
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [deleteFiles, setDeleteFiles] = useState<T[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [startingIndex, setStartingIndex] = useState(0)
 
   useEffect(() => {
-    setDefaultList(defaultFiles)
-    setUploadedFiles([])
-    setDeleteFiles([])
-  }, [defaultFiles])
+    if (defaultFiles.length === 0 && initFiles.length > 0) {
+      setInitFiles(defaultFiles)
+      setUploadedFiles([])
+      setDeleteFiles([])
+    } else if (defaultFiles.length > 0) {
+      setInitFiles(defaultFiles)
+      setUploadedFiles([])
+      setDeleteFiles([])
+    }
+  }, [defaultFiles, initFiles])
 
   const transformedInitialImages = useMemo(() => {
-    return defaultList.map(file => {
-      const src = srcImage(file) || ''
-      return {
-        src,
-        alt: altImage(file),
-        isImage: isImageFile(fileNameFromUrl(src))
-      }
-    })
-  }, [defaultList, srcImage, altImage])
+    return defaultFiles.map(file => ({
+      src: srcImage(file) || '',
+      alt: altImage(file),
+      isImage: isImageFile(fileNameFromUrl(srcImage(file) || ''))
+    }))
+  }, [defaultFiles, srcImage, altImage])
 
   const transformedUploadedImages = useMemo(() => {
     return uploadedFiles.map(file => ({
@@ -69,39 +75,44 @@ const UploadMultipleFile = <T extends FileObject>({
     return [...transformedInitialImages, ...transformedUploadedImages]
   }, [transformedInitialImages, transformedUploadedImages])
 
-  const handleUploadFiles = (files: File[]) => {
-    if (maxFiles && files.length + uploadedFiles.length + defaultList.length > maxFiles) {
-      setError(`คุณสามารถอัปโหลดได้สูงสุด ${maxFiles} ไฟล์`)
-      return
+  const handleUploadFiles = (fileList: File[]) => {
+    if (dropzoneOptions) {
+      if (
+        dropzoneOptions.maxFiles &&
+        fileList.length + uploadedFiles.length + initFiles.length > dropzoneOptions.maxFiles
+      ) {
+        setError(`คุณสามารถอัปโหลดได้สูงสุด ${dropzoneOptions.maxFiles} ไฟล์`)
+        return
+      }
     }
 
     setError('')
-    const newFiles = [...uploadedFiles, ...files]
+    const newFiles = [...uploadedFiles, ...fileList]
     setUploadedFiles(newFiles)
-    onFilesAccepted && onFilesAccepted(newFiles)
+    onFilesUpload && onFilesUpload(newFiles)
   }
 
   const handleRemoveFiles = (index: number) => {
-    if (index < defaultList.length) {
-      // Remove from defaultFiles
-      const delFile = defaultList.find((_, i) => i === index)
+    if (index < initFiles.length) {
+      // Remove from files
+      const delFile = initFiles.find((_, i) => i === index)
       if (delFile) {
         const delFileList = [...deleteFiles, delFile]
         setDeleteFiles(delFileList)
-        const newDefaultFiles = defaultList.filter((_, i) => i !== index)
-        setDefaultList(newDefaultFiles)
+        const newFiles = initFiles.filter((_, i) => i !== index)
+        setInitFiles(newFiles)
         onFilesDeleted && onFilesDeleted(delFileList)
       }
     } else {
       // Remove from uploadedFiles
-      const newFiles = uploadedFiles.filter((_, i) => i !== index - defaultList.length)
+      const newFiles = uploadedFiles.filter((_, i) => i !== index - initFiles.length)
       setUploadedFiles(newFiles)
     }
   }
 
   return (
     <Fragment>
-      <Dropzone onDrop={handleUploadFiles} {...dropzoneProps}>
+      <Dropzone onDrop={handleUploadFiles} {...dropzoneOptions}>
         {({ getRootProps, getInputProps, open }) => (
           <section>
             <div {...getRootProps()} className='w-full'>
@@ -111,11 +122,15 @@ const UploadMultipleFile = <T extends FileObject>({
                   'flex flex-col items-center justify-center gap-2',
                   'rounded-xl border-2 border-dashed border-default-200 text-default-500',
                   'cursor-pointer py-5 ',
-                  className
+                  dropzoneClassName
                 )}>
-                <Icon icon='lucide:upload' width={25} />
-                <Button onClick={open}>Upload File</Button>
-                <p className='text-sm'>or Drag and Drop</p>
+                {dropzoneContent || (
+                  <Fragment>
+                    <Icon icon='lucide:upload' width={25} />
+                    <Button onClick={open}>Upload File</Button>
+                    <p className='text-sm'>or Drag and Drop</p>
+                  </Fragment>
+                )}
               </div>
             </div>
           </section>
@@ -131,16 +146,17 @@ const UploadMultipleFile = <T extends FileObject>({
 
       {/* Display uploaded and initial files */}
       <SlideshowLightbox
+        lightboxIdentifier='lightBoxUploadMultipleFile'
         images={transformedImages.filter(file => file.isImage)}
         open={isOpen}
         startingSlideIndex={startingIndex}
         showThumbnails={true}
         onClose={() => setIsOpen(false)}
-        lightboxIdentifier='lightBoxUploaMultipleFile'
+        modalClose={'clickOutside'}
         backgroundColor='rgba(255, 255, 255, 0.8)'
       />
 
-      <div className='mt-5 flex flex-col gap-2'>
+      <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
         {transformedImages.length > 0 &&
           transformedImages.map((file, index) => {
             const isImage = file.isImage
@@ -148,7 +164,7 @@ const UploadMultipleFile = <T extends FileObject>({
             return (
               <div className='flex items-center justify-between gap-4 hover:bg-default/15' key={index}>
                 <div
-                  className='flex flex-1 items-center gap-2 hover:opacity-80'
+                  className={cn('flex flex-1 items-center gap-2 hover:opacity-80', isImage && 'cursor-pointer')}
                   onClick={() => {
                     if (isImage) {
                       setIsOpen(true)
@@ -163,13 +179,13 @@ const UploadMultipleFile = <T extends FileObject>({
                       className='h-11 w-14 object-cover'
                     />
                   ) : (
-                    <Icon icon='solar:document-bold-duotone' width={40} className='text-primary' />
+                    <Icon icon='solar:document-bold' width={40} className='text-primary' />
                   )}
                   <div className='flex flex-1 flex-col'>
                     <p className='flex-1 truncate text-nowrap'>{file.alt}</p>
-                    {index >= defaultList.length ? (
+                    {index >= initFiles.length ? (
                       <p className='text-sm text-default-500'>
-                        {formatFileSize(uploadedFiles[index - defaultList.length].size)}
+                        {formatFileSize(uploadedFiles[index - initFiles.length].size)}
                       </p>
                     ) : (
                       <p className='text-sm text-default-500'>อัพโหลดเสร็จสิ้น</p>

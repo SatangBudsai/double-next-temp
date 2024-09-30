@@ -103,6 +103,7 @@ const Home = (props: Props) => {
         }}
         dropzoneOptions={{
           maxFiles: 10,
+          maxSize: 1 * 1024 * 1024,
           accept: {
             'image/jpeg': [],
             'image/png': []

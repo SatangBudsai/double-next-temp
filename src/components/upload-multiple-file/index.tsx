@@ -3,7 +3,7 @@ import { Icon } from '@iconify/react'
 import { Button, Image } from '@nextui-org/react'
 import { SlideshowLightbox } from 'lightbox.js-react'
 import React, { useState, useEffect, Fragment, useMemo } from 'react'
-import Dropzone, { DropzoneOptions } from 'react-dropzone'
+import Dropzone, { DropzoneOptions, FileRejection } from 'react-dropzone'
 import 'lightbox.js-react/dist/index.css'
 import { isImageFile } from '@/utils/images/isImageFile'
 import { formatFileSize } from '@/utils/images/formatFileSize'
@@ -69,7 +69,8 @@ const UploadMultipleFile = <T extends FileObject>({
     return [...transformedInitialImages, ...transformedUploadedImages]
   }, [transformedInitialImages, transformedUploadedImages])
 
-  const handleUploadFiles = (fileList: File[]) => {
+  const handleUploadFiles = (fileList: File[], rejectedFiles: FileRejection[]) => {
+    console.log('🚀 ~ handleUploadFiles ~ fileList:', fileList)
     if (dropzoneOptions) {
       if (
         dropzoneOptions.maxFiles &&
@@ -77,6 +78,16 @@ const UploadMultipleFile = <T extends FileObject>({
       ) {
         setError(`คุณสามารถอัปโหลดได้สูงสุด ${dropzoneOptions.maxFiles} ไฟล์`)
         return
+      }
+
+      if (rejectedFiles.length > 0) {
+        const oversizedFiles = rejectedFiles.filter(rejection =>
+          rejection.errors.some(error => error.code === 'file-too-large')
+        )
+        if (oversizedFiles.length > 0) {
+          setError(`ไฟล์ที่คุณพยายามอัปโหลดมีขนาดใหญ่กว่า ${formatFileSize(dropzoneOptions?.maxSize || 0)} ที่กำหนด`)
+          return
+        }
       }
     }
 

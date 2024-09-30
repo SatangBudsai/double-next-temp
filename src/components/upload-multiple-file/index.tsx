@@ -44,24 +44,18 @@ const UploadMultipleFile = <T extends FileObject>({
   const [startingIndex, setStartingIndex] = useState(0)
 
   useEffect(() => {
-    if (defaultFiles.length === 0 && initFiles.length > 0) {
-      setInitFiles(defaultFiles)
-      setUploadedFiles([])
-      setDeleteFiles([])
-    } else if (defaultFiles.length > 0) {
-      setInitFiles(defaultFiles)
-      setUploadedFiles([])
-      setDeleteFiles([])
-    }
-  }, [defaultFiles, initFiles])
+    setInitFiles(defaultFiles)
+    setUploadedFiles([])
+    setDeleteFiles([])
+  }, [defaultFiles])
 
   const transformedInitialImages = useMemo(() => {
-    return defaultFiles.map(file => ({
+    return initFiles.map(file => ({
       src: srcImage(file) || '',
       alt: altImage(file),
       isImage: isImageFile(fileNameFromUrl(srcImage(file) || ''))
     }))
-  }, [defaultFiles, srcImage, altImage])
+  }, [initFiles, srcImage, altImage])
 
   const transformedUploadedImages = useMemo(() => {
     return uploadedFiles.map(file => ({
@@ -121,7 +115,7 @@ const UploadMultipleFile = <T extends FileObject>({
                 className={cn(
                   'flex flex-col items-center justify-center gap-2',
                   'rounded-xl border-2 border-dashed border-default-200 text-default-500',
-                  'cursor-pointer py-5 ',
+                  'h-52 cursor-pointer py-5',
                   dropzoneClassName
                 )}>
                 {dropzoneContent || (

@@ -8,6 +8,8 @@ import 'lightbox.js-react/dist/index.css'
 import { isImageFile } from '@/utils/images/isImageFile'
 import { formatFileSize } from '@/utils/images/formatFileSize'
 import { fileNameFromUrl } from '@/utils/images/fileNameFormUrl'
+import path from 'path'
+import { getIconFileName } from '@/utils/images/getIconFileName'
 
 interface FileObject {
   [key: string]: any
@@ -16,7 +18,8 @@ interface FileObject {
 interface UploadMultipleFileProps<T> {
   defaultFiles: T[] | []
   srcImage?: (file: T) => string | undefined | null
-  altImage?: (file: T) => string | undefined | null
+  fileName?: (file: T) => string | undefined | null
+  fileSize?: (file: T) => string | undefined | null
   onFilesUpload?: (files: File[]) => void
   onFilesDeleted?: (deleteFile: T[]) => void
   dropzoneContent?: React.ReactNode
@@ -30,7 +33,7 @@ const UploadMultipleFile = <T extends FileObject>({
   onFilesUpload,
   onFilesDeleted,
   srcImage = file => file?.src,
-  altImage = file => file?.alt,
+  fileName = file => file?.alt,
   dropzoneClassName,
   contentClassName,
   dropzoneContent,
@@ -52,16 +55,18 @@ const UploadMultipleFile = <T extends FileObject>({
   const transformedInitialImages = useMemo(() => {
     return initFiles.map(file => ({
       src: srcImage(file) || '',
-      alt: altImage(file),
-      isImage: isImageFile(fileNameFromUrl(srcImage(file) || ''))
+      fileName: fileName(file),
+      isImage: isImageFile(fileNameFromUrl(srcImage(file) || '')),
+      type: 'existing' // Custom property to distinguish uploaded or default
     }))
-  }, [initFiles, srcImage, altImage])
+  }, [initFiles, srcImage, fileName])
 
   const transformedUploadedImages = useMemo(() => {
     return uploadedFiles.map(file => ({
       src: URL.createObjectURL(file),
-      alt: file.name,
-      isImage: file.type.startsWith('image/')
+      fileName: file.name,
+      isImage: file.type.startsWith('image/'),
+      type: file.type
     }))
   }, [uploadedFiles])
 
@@ -71,6 +76,19 @@ const UploadMultipleFile = <T extends FileObject>({
 
   const handleUploadFiles = (fileList: File[], rejectedFiles: FileRejection[]) => {
     console.log('🚀 ~ handleUploadFiles ~ fileList:', fileList)
+
+    // Check for duplicate filenames
+    const existingFileNames = [
+      ...initFiles.map(file => fileName(file)),
+      ...uploadedFiles.map(file => file.name)
+    ].filter(Boolean)
+
+    const duplicateFiles = fileList.filter(file => existingFileNames.includes(file.name))
+    if (duplicateFiles.length > 0) {
+      setError('ไม่สามารถอัปโหลดไฟล์ที่มีชื่อซ้ำได้')
+      return
+    }
+
     if (dropzoneOptions) {
       if (
         dropzoneOptions.maxFiles &&
@@ -86,6 +104,14 @@ const UploadMultipleFile = <T extends FileObject>({
         )
         if (oversizedFiles.length > 0) {
           setError(`ไฟล์ที่คุณพยายามอัปโหลดมีขนาดใหญ่กว่า ${formatFileSize(dropzoneOptions?.maxSize || 0)} ที่กำหนด`)
+          return
+        }
+
+        const unsupportedFiles = rejectedFiles.filter(rejection =>
+          rejection.errors.some(error => error.code === 'file-invalid-type')
+        )
+        if (unsupportedFiles.length > 0) {
+          setError('ไฟล์ที่คุณพยายามอัปโหลดไม่ใช่ประเภทที่รองรับ')
           return
         }
       }
@@ -179,15 +205,15 @@ const UploadMultipleFile = <T extends FileObject>({
                   {isImage ? (
                     <Image
                       src={file.src || '/images/@mock/300x200.jpg'}
-                      alt={file.alt || ''}
+                      alt={file.fileName || ''}
                       radius='sm'
                       className='h-11 w-14 object-cover'
                     />
                   ) : (
-                    <Icon icon='solar:document-bold' width={40} className='text-primary' />
+                    <Icon icon={getIconFileName(file.fileName as string)} width={40} className='text-primary' />
                   )}
                   <div className='flex flex-1 flex-col'>
-                    <p className='flex-1 truncate text-nowrap'>{file.alt}</p>
+                    <p className='flex-1 truncate text-nowrap'>{file.fileName}</p>
                     {index >= initFiles.length ? (
                       <p className='text-sm text-default-500'>
                         {formatFileSize(uploadedFiles[index - initFiles.length].size)}

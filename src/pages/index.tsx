@@ -14,24 +14,26 @@ import { Controller, useForm } from 'react-hook-form'
 import { SlideshowLightbox } from 'lightbox.js-react'
 import { useTranslation } from 'react-i18next'
 import UploadMultipleFile from '@/components/upload-multiple-file'
+import UploadSingleFile from '@/components/upload-singer-file'
 
 type ItemsType = {
-  path: string
-  label: string
+  pathURL: string
+  fileName: string
 }
 
 const items: ItemsType[] = [
   {
-    path: 'https://pixlr.com/images/generator/text-to-image.webp',
-    label: 'รูป'
+    pathURL: 'https://pixlr.com/images/generator/text-to-image.webp',
+    fileName: 'text-to-image.webp'
   },
   {
-    path: 'https://fps.cdnpk.net/images/home/subhome-ai.webp?w=649&h=649',
-    label: 'รูป 2'
+    pathURL: 'https://fps.cdnpk.net/images/home/subhome-ai.webp?w=649&h=649',
+    fileName: 'subhome-ai.webp'
   },
   {
-    path: 'https://img.freepik.com/free-photo/abstract-autumn-beauty-multi-colored-leaf-vein-pattern-generated-by-ai_188544-9871.jpg',
-    label: 'รูป 3'
+    pathURL:
+      'https://img.freepik.com/free-photo/abstract-autumn-beauty-multi-colored-leaf-vein-pattern-generated-by-ai_188544-9871.jpg',
+    fileName: 'abstract-autumn-beauty-multi-colored-leaf-vein-pattern-generated-by-ai_188544-9871.jpg'
   }
 ]
 
@@ -91,23 +93,21 @@ const Home = (props: Props) => {
     <Fragment>
       <UploadMultipleFile
         defaultFiles={items}
-        srcImage={file => file.path}
-        altImage={file => file.label}
+        srcImage={file => file.pathURL}
+        fileName={file => file.fileName}
         onFilesUpload={files => {
-          console.log('🚀 ~ Upload ~ files:', files)
           setUploadFiles(files)
         }}
         onFilesDeleted={files => {
-          console.log('🚀 ~ Delete ~ files:', files)
           setDefaultFiles(files)
         }}
         dropzoneOptions={{
-          maxFiles: 10,
-          maxSize: 1 * 1024 * 1024,
-          accept: {
-            'image/jpeg': [],
-            'image/png': []
-          }
+          maxFiles: 10
+          // maxSize: 5 * 1024 * 1024
+          // accept: {
+          //   'image/jpeg': [],
+          //   'image/png': []
+          // }
         }}
       />
       <Spacer y={5} />

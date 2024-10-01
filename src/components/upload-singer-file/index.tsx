@@ -5,9 +5,9 @@ import { SlideshowLightbox } from 'lightbox.js-react'
 import React, { useState, useEffect, Fragment, useMemo } from 'react'
 import Dropzone, { DropzoneOptions } from 'react-dropzone'
 import 'lightbox.js-react/dist/index.css'
-import { isImageFile } from '@/utils/images/isImageFile'
-import { formatFileSize } from '@/utils/images/formatFileSize'
-import { fileNameFromUrl } from '@/utils/images/fileNameFormUrl'
+import { isImageFile } from '@/utils/upload-files/isImageFile'
+import { formatFileSize } from '@/utils/upload-files/formatFileSize'
+import { fileNameFromUrl } from '@/utils/upload-files/fileNameFormUrl'
 
 interface FileObject {
   [key: string]: any

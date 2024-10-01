@@ -5,11 +5,11 @@ import { SlideshowLightbox } from 'lightbox.js-react'
 import React, { useState, useEffect, Fragment, useMemo } from 'react'
 import Dropzone, { DropzoneOptions, FileRejection } from 'react-dropzone'
 import 'lightbox.js-react/dist/index.css'
-import { isImageFile } from '@/utils/images/isImageFile'
-import { formatFileSize } from '@/utils/images/formatFileSize'
-import { fileNameFromUrl } from '@/utils/images/fileNameFormUrl'
+import { isImageFile } from '@/utils/upload-files/isImageFile'
+import { formatFileSize } from '@/utils/upload-files/formatFileSize'
+import { fileNameFromUrl } from '@/utils/upload-files/fileNameFormUrl'
 import path from 'path'
-import { getIconFileName } from '@/utils/images/getIconFileName'
+import { getIconFileName } from '@/utils/upload-files/getIconFileName'
 
 interface FileObject {
   [key: string]: any

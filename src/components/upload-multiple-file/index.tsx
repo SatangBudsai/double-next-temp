@@ -15,11 +15,14 @@ interface FileObject {
   [key: string]: any
 }
 
+interface ErrorCategory {
+  [category: string]: string[] // Each category is a list of error messages.
+}
 interface UploadMultipleFileProps<T> {
   defaultFiles: T[] | []
   srcImage?: (file: T) => string | undefined | null
   fileName?: (file: T) => string | undefined | null
-  fileSize?: (file: T) => string | undefined | null
+  fileSize?: (file: T) => number | undefined | null
   onFilesUpload?: (files: File[]) => void
   onFilesDeleted?: (deleteFile: T[]) => void
   dropzoneContent?: React.ReactNode
@@ -34,12 +37,14 @@ const UploadMultipleFile = <T extends FileObject>({
   onFilesDeleted,
   srcImage = file => file?.src,
   fileName = file => file?.alt,
+  fileSize = file => file?.fileSize,
   dropzoneClassName,
   contentClassName,
   dropzoneContent,
   dropzoneOptions
 }: UploadMultipleFileProps<T>) => {
-  const [error, setError] = useState<string>('')
+  const [errors, setErrors] = useState<ErrorCategory>({})
+  console.log('🚀 ~ errors:', errors)
   const [initFiles, setInitFiles] = useState<T[]>([])
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [deleteFiles, setDeleteFiles] = useState<T[]>([])
@@ -57,16 +62,16 @@ const UploadMultipleFile = <T extends FileObject>({
       src: srcImage(file) || '',
       fileName: fileName(file),
       isImage: isImageFile(fileNameFromUrl(srcImage(file) || '')),
-      type: 'existing' // Custom property to distinguish uploaded or default
+      fileSize: fileSize(file) || 0
     }))
-  }, [initFiles, srcImage, fileName])
+  }, [initFiles, srcImage, fileName, fileSize])
 
   const transformedUploadedImages = useMemo(() => {
     return uploadedFiles.map(file => ({
       src: URL.createObjectURL(file),
       fileName: file.name,
       isImage: file.type.startsWith('image/'),
-      type: file.type
+      fileSize: file.size
     }))
   }, [uploadedFiles])
 
@@ -75,7 +80,13 @@ const UploadMultipleFile = <T extends FileObject>({
   }, [transformedInitialImages, transformedUploadedImages])
 
   const handleUploadFiles = (fileList: File[], rejectedFiles: FileRejection[]) => {
-    console.log('🚀 ~ handleUploadFiles ~ fileList:', fileList)
+    // Initialize an object to hold categorized errors
+    let errorCategories: ErrorCategory = {
+      duplicateFiles: [],
+      oversizedFiles: [],
+      unsupportedFiles: [],
+      maxFilesExceeded: []
+    }
 
     // Check for duplicate filenames
     const existingFileNames = [
@@ -85,39 +96,47 @@ const UploadMultipleFile = <T extends FileObject>({
 
     const duplicateFiles = fileList.filter(file => existingFileNames.includes(file.name))
     if (duplicateFiles.length > 0) {
-      setError('ไม่สามารถอัปโหลดไฟล์ที่มีชื่อซ้ำได้')
-      return
+      duplicateFiles.forEach(file => {
+        errorCategories.duplicateFiles.push(`ชื่อไฟล์ซ้ำ: "${file.name}"`)
+      })
     }
 
     if (dropzoneOptions) {
+      // Check for maximum file count
       if (
         dropzoneOptions.maxFiles &&
         fileList.length + uploadedFiles.length + initFiles.length > dropzoneOptions.maxFiles
       ) {
-        setError(`คุณสามารถอัปโหลดได้สูงสุด ${dropzoneOptions.maxFiles} ไฟล์`)
-        return
+        errorCategories.maxFilesExceeded.push(`คุณสามารถอัปโหลดได้สูงสุด ${dropzoneOptions.maxFiles} ไฟล์`)
       }
 
-      if (rejectedFiles.length > 0) {
-        const oversizedFiles = rejectedFiles.filter(rejection =>
-          rejection.errors.some(error => error.code === 'file-too-large')
-        )
-        if (oversizedFiles.length > 0) {
-          setError(`ไฟล์ที่คุณพยายามอัปโหลดมีขนาดใหญ่กว่า ${formatFileSize(dropzoneOptions?.maxSize || 0)} ที่กำหนด`)
-          return
-        }
-
-        const unsupportedFiles = rejectedFiles.filter(rejection =>
-          rejection.errors.some(error => error.code === 'file-invalid-type')
-        )
-        if (unsupportedFiles.length > 0) {
-          setError('ไฟล์ที่คุณพยายามอัปโหลดไม่ใช่ประเภทที่รองรับ')
-          return
-        }
-      }
+      // Check for rejected files due to size and type
+      rejectedFiles.forEach(rejection => {
+        rejection.errors.forEach(error => {
+          if (error.code === 'file-too-large') {
+            errorCategories.oversizedFiles.push(
+              `ขนาดไฟล์เกินกำหนด: "${rejection.file.name}" ขนาดใหญ่กว่า ${formatFileSize(dropzoneOptions?.maxSize || 0)}`
+            )
+          }
+          if (error.code === 'file-invalid-type') {
+            errorCategories.unsupportedFiles.push(`ประเภทไฟล์ไม่รองรับ: "${rejection.file.name}"`)
+          }
+        })
+      })
     }
 
-    setError('')
+    // Set the categorized errors or clear errors if no errors exist
+    if (
+      errorCategories.duplicateFiles.length > 0 ||
+      errorCategories.oversizedFiles.length > 0 ||
+      errorCategories.unsupportedFiles.length > 0 ||
+      errorCategories.maxFilesExceeded.length > 0
+    ) {
+      setErrors(errorCategories)
+      return
+    }
+
+    setErrors({})
     const newFiles = [...uploadedFiles, ...fileList]
     setUploadedFiles(newFiles)
     onFilesUpload && onFilesUpload(newFiles)
@@ -169,9 +188,25 @@ const UploadMultipleFile = <T extends FileObject>({
       </Dropzone>
 
       {/* Error Message */}
-      {error && (
-        <div>
-          <p className='mt-2 rounded-lg bg-danger/10 p-2 text-danger'>{error}</p>
+      {Object.keys(errors).length > 0 && (
+        <div className='mt-2 rounded-lg bg-danger/10 p-5 text-danger'>
+          <p className='text-lg font-semibold'>ไฟล์อัพโหลดไม่ตรงตามเงื่อนไขที่กำหนดดังนี้</p>
+          <ul className='list-disc pl-5 text-sm'>
+            {Object.entries(errors).map(([category, messages]) => (
+              <Fragment key={category}>
+                {messages.length > 0 && (
+                  <li>
+                    <p className='font-semibold uppercase'>{category}:</p>
+                    <ul className='list-disc pl-5'>
+                      {messages.map((message, index) => (
+                        <li key={index}>{message}</li>
+                      ))}
+                    </ul>
+                  </li>
+                )}
+              </Fragment>
+            ))}
+          </ul>
         </div>
       )}
 
@@ -191,6 +226,7 @@ const UploadMultipleFile = <T extends FileObject>({
         {transformedImages.length > 0 &&
           transformedImages.map((file, index) => {
             const isImage = file.isImage
+            console.log('file.fileSize', file.fileSize)
 
             return (
               <div className='flex items-center justify-between gap-4 hover:bg-default/15' key={index}>
@@ -210,17 +246,19 @@ const UploadMultipleFile = <T extends FileObject>({
                       className='h-11 w-14 object-cover'
                     />
                   ) : (
-                    <Icon icon={getIconFileName(file.fileName as string)} width={40} className='text-primary' />
+                    <Icon icon={getIconFileName(file.fileName as string)} width={40} className='w-14 text-primary' />
                   )}
                   <div className='flex flex-1 flex-col'>
                     <p className='flex-1 truncate text-nowrap'>{file.fileName}</p>
-                    {index >= initFiles.length ? (
+                    <div className='flex gap-1'>
+                      <Icon
+                        icon='solar:check-circle-bold-duotone'
+                        className={cn(index < initFiles.length ? 'text-success' : 'text-default-400')}
+                      />
                       <p className='text-sm text-default-500'>
-                        {formatFileSize(uploadedFiles[index - initFiles.length].size)}
+                        {file.fileSize ? formatFileSize(file.fileSize) : 'อัพโหลดเเล้ว'}
                       </p>
-                    ) : (
-                      <p className='text-sm text-default-500'>อัพโหลดเสร็จสิ้น</p>
-                    )}
+                    </div>
                   </div>
                 </div>
                 <Button size='sm' color='danger' variant='bordered' isIconOnly onPress={() => handleRemoveFiles(index)}>

@@ -91,27 +91,6 @@ const Home = (props: Props) => {
 
   return (
     <Fragment>
-      <UploadMultipleFile
-        defaultFiles={items}
-        srcImage={file => file.pathURL}
-        fileName={file => file.fileName}
-        onFilesUpload={files => {
-          setUploadFiles(files)
-        }}
-        onFilesDeleted={files => {
-          setDefaultFiles(files)
-        }}
-        dropzoneOptions={{
-          maxFiles: 10
-          // maxSize: 5 * 1024 * 1024
-          // accept: {
-          //   'image/jpeg': [],
-          //   'image/png': []
-          // }
-        }}
-      />
-      <Spacer y={5} />
-
       <div className='flex flex-col gap-5'>
         <div className='flex flex-wrap items-center justify-center gap-5'>Template NextJs and NextUI</div>
         <div className='flex justify-center'>{tCommon('hello')}</div>

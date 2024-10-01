@@ -16,6 +16,12 @@ const useSectionItems = () => {
             title: 'หน้าหลัก'
           },
           {
+            key: 'upload-file',
+            href: '/upload-file',
+            icon: 'solar:upload-square-linear',
+            title: 'อัปโหลดไฟล์'
+          },
+          {
             key: 'dashboard',
             href: '/dashboard',
             icon: 'solar:widget-2-outline',

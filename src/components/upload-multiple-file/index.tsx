@@ -62,7 +62,7 @@ const UploadMultipleFile = <T extends FileObject>({
       src: srcImage(file) || '',
       fileName: fileName(file),
       isImage: isImageFile(fileNameFromUrl(srcImage(file) || '')),
-      fileSize: fileSize(file) || 0
+      fileSize: fileSize(file)
     }))
   }, [initFiles, srcImage, fileName, fileSize])
 
@@ -256,7 +256,11 @@ const UploadMultipleFile = <T extends FileObject>({
                         className={cn(index < initFiles.length ? 'text-success' : 'text-default-400')}
                       />
                       <p className='text-sm text-default-500'>
-                        {file.fileSize ? formatFileSize(file.fileSize) : 'อัพโหลดเเล้ว'}
+                        {file.fileSize
+                          ? formatFileSize(file.fileSize)
+                          : file.fileSize === 0
+                            ? 'ไม่พบไฟล์'
+                            : 'อัพโหลดเเล้ว'}
                       </p>
                     </div>
                   </div>

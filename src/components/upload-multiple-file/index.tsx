@@ -23,8 +23,10 @@ interface UploadMultipleFileProps<T> {
   srcImage?: (file: T) => string | undefined | null
   fileName?: (file: T) => string | undefined | null
   fileSize?: (file: T) => number | undefined | null
-  onFilesSelect?: (files: File[]) => void
-  onDefaultFilesRemove?: (deleteFile: T[]) => void
+  isDrag?: boolean
+  onFilesSelect?: (files: { order: number; file: File }[]) => void
+  onDefaultFilesRemove?: (value: T[]) => void
+  onDefaultFilesDrag?: (value: T[]) => void
   dropzoneContent?: React.ReactNode
   dropzoneClassName?: string
   contentClassName?: string

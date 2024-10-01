@@ -23,8 +23,8 @@ interface UploadMultipleFileProps<T> {
   srcImage?: (file: T) => string | undefined | null
   fileName?: (file: T) => string | undefined | null
   fileSize?: (file: T) => number | undefined | null
-  onFilesUpload?: (files: File[]) => void
-  onFilesDeleted?: (deleteFile: T[]) => void
+  onFilesSelect?: (files: File[]) => void
+  onDefaultFilesRemove?: (deleteFile: T[]) => void
   dropzoneContent?: React.ReactNode
   dropzoneClassName?: string
   contentClassName?: string
@@ -33,8 +33,8 @@ interface UploadMultipleFileProps<T> {
 
 const UploadMultipleFile = <T extends FileObject>({
   defaultFiles = [],
-  onFilesUpload,
-  onFilesDeleted,
+  onFilesSelect,
+  onDefaultFilesRemove,
   srcImage = file => file?.src,
   fileName = file => file?.alt,
   fileSize = file => file?.fileSize,
@@ -44,7 +44,6 @@ const UploadMultipleFile = <T extends FileObject>({
   dropzoneOptions
 }: UploadMultipleFileProps<T>) => {
   const [errors, setErrors] = useState<ErrorCategory>({})
-  console.log('🚀 ~ errors:', errors)
   const [initFiles, setInitFiles] = useState<T[]>([])
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [deleteFiles, setDeleteFiles] = useState<T[]>([])
@@ -57,7 +56,7 @@ const UploadMultipleFile = <T extends FileObject>({
     setDeleteFiles([])
   }, [defaultFiles])
 
-  const transformedInitialImages = useMemo(() => {
+  const transformedDefaultImages = useMemo(() => {
     return initFiles.map(file => ({
       src: srcImage(file) || '',
       fileName: fileName(file),
@@ -66,7 +65,7 @@ const UploadMultipleFile = <T extends FileObject>({
     }))
   }, [initFiles, srcImage, fileName, fileSize])
 
-  const transformedUploadedImages = useMemo(() => {
+  const transformedSelectImages = useMemo(() => {
     return uploadedFiles.map(file => ({
       src: URL.createObjectURL(file),
       fileName: file.name,
@@ -76,8 +75,8 @@ const UploadMultipleFile = <T extends FileObject>({
   }, [uploadedFiles])
 
   const transformedImages = useMemo(() => {
-    return [...transformedInitialImages, ...transformedUploadedImages]
-  }, [transformedInitialImages, transformedUploadedImages])
+    return [...transformedDefaultImages, ...transformedSelectImages]
+  }, [transformedDefaultImages, transformedSelectImages])
 
   const handleUploadFiles = (fileList: File[], rejectedFiles: FileRejection[]) => {
     // Initialize an object to hold categorized errors
@@ -139,7 +138,7 @@ const UploadMultipleFile = <T extends FileObject>({
     setErrors({})
     const newFiles = [...uploadedFiles, ...fileList]
     setUploadedFiles(newFiles)
-    onFilesUpload && onFilesUpload(newFiles)
+    onFilesSelect && onFilesSelect(newFiles)
   }
 
   const handleRemoveFiles = (index: number) => {
@@ -151,7 +150,7 @@ const UploadMultipleFile = <T extends FileObject>({
         setDeleteFiles(delFileList)
         const newFiles = initFiles.filter((_, i) => i !== index)
         setInitFiles(newFiles)
-        onFilesDeleted && onFilesDeleted(delFileList)
+        onDefaultFilesRemove && onDefaultFilesRemove(delFileList)
       }
     } else {
       // Remove from uploadedFiles

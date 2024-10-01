@@ -71,10 +71,10 @@ const UploadFile = (props: Props) => {
         srcImage={file => file.pathURL}
         fileName={file => file.fileName}
         fileSize={file => file.fileSize}
-        onFilesUpload={files => {
+        onFilesSelect={files => {
           setUploadFiles(files)
         }}
-        onFilesDeleted={files => {
+        onDefaultFilesRemove={files => {
           setDefaultFiles(files)
         }}
         dropzoneOptions={{

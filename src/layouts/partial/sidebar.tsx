@@ -17,10 +17,10 @@ type Props = {
 const Sidebar = (props: Props) => {
   const sectionItems = useSectionItems()
   const appSettingState = useSelector((state: StateType) => state.appSettingState)
-  const { isMobile } = useBreakpoint()
+  const { isMobile, isIpad } = useBreakpoint()
   const { setTheme, theme } = useTheme()
 
-  const isCompact = props.disableIsCompact ? false : appSettingState.isCompact || isMobile
+  const isCompact = props.disableIsCompact ? false : appSettingState.isCompact || isIpad
 
   const handleChangeTheme = () => {
     if (theme === 'light') {

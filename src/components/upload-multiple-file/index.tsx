@@ -47,7 +47,7 @@ const UploadMultipleFile = <T extends FileObject>({
 }: UploadMultipleFileProps<T>) => {
   const [errors, setErrors] = useState<ErrorCategory>({})
   const [initFiles, setInitFiles] = useState<T[]>([])
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+  const [uploadedFiles, setUploadedFiles] = useState<{ order: number; file: File }[]>([])
   const [deleteFiles, setDeleteFiles] = useState<T[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [startingIndex, setStartingIndex] = useState(0)
@@ -59,20 +59,20 @@ const UploadMultipleFile = <T extends FileObject>({
   }, [defaultFiles])
 
   const transformedDefaultImages = useMemo(() => {
-    return initFiles.map(file => ({
-      src: srcImage(file) || '',
-      fileName: fileName(file),
-      isImage: isImageFile(fileNameFromUrl(srcImage(file) || '')),
-      fileSize: fileSize(file)
+    return initFiles.map(item => ({
+      src: srcImage(item) || '',
+      fileName: fileName(item),
+      isImage: isImageFile(fileNameFromUrl(srcImage(item) || '')),
+      fileSize: fileSize(item)
     }))
   }, [initFiles, srcImage, fileName, fileSize])
 
   const transformedSelectImages = useMemo(() => {
-    return uploadedFiles.map(file => ({
-      src: URL.createObjectURL(file),
-      fileName: file.name,
-      isImage: file.type.startsWith('image/'),
-      fileSize: file.size
+    return uploadedFiles.map(item => ({
+      src: URL.createObjectURL(item.file),
+      fileName: item.file.name,
+      isImage: item.file.type.startsWith('image/'),
+      fileSize: item.file.size
     }))
   }, [uploadedFiles])
 
@@ -92,7 +92,7 @@ const UploadMultipleFile = <T extends FileObject>({
     // Check for duplicate filenames
     const existingFileNames = [
       ...initFiles.map(file => fileName(file)),
-      ...uploadedFiles.map(file => file.name)
+      ...uploadedFiles.map(item => item.file.name)
     ].filter(Boolean)
 
     const duplicateFiles = fileList.filter(file => existingFileNames.includes(file.name))
@@ -137,10 +137,16 @@ const UploadMultipleFile = <T extends FileObject>({
       return
     }
 
-    setErrors({})
-    const newFiles = [...uploadedFiles, ...fileList]
+    let formatFileList: { order: number; file: File }[] = []
+    fileList.forEach((file, index) => {
+      formatFileList.push({ file: file, order: index })
+    })
+
+    const newFiles = [...uploadedFiles, ...formatFileList]
     setUploadedFiles(newFiles)
     onFilesSelect && onFilesSelect(newFiles)
+
+    setErrors({})
   }
 
   const handleRemoveFiles = (index: number) => {
@@ -227,7 +233,6 @@ const UploadMultipleFile = <T extends FileObject>({
         {transformedImages.length > 0 &&
           transformedImages.map((file, index) => {
             const isImage = file.isImage
-            console.log('file.fileSize', file.fileSize)
 
             return (
               <div className='flex items-center justify-between gap-4 hover:bg-default/15' key={index}>

@@ -22,16 +22,6 @@ type ItemsType = {
   fileName: string
   fileSize: number
   order: number
-  bbb?: {
-    c?: number
-    ccc?: number
-  }
-  aaa?: {
-    c?: number
-    eee?: {
-      vv?: string
-    }
-  }
 }
 
 const items: ItemsType[] = [
@@ -86,8 +76,8 @@ const UploadFile = (props: Props) => {
         srcImage={file => file.pathURL}
         fileName={file => file.fileName}
         fileSize={file => file.fileSize}
-        isDrag={true}
-        orderKey='order'
+        // isDrag={true}
+        // orderKey='order'
         onSelectFiles={value => {
           console.log('🚀 ~ onSelectFiles ~ value:', value)
           setUploadFiles(value.map(item => item.file))
@@ -96,10 +86,10 @@ const UploadFile = (props: Props) => {
           console.log('🚀 ~ onRemoveDefaultFiles ~ value:', value)
           setDefaultFilesRemove(value)
         }}
-        // onChangeOrderDefaultFilesDrag={value => {
-        //   console.log('🚀 ~ onChangeOrderDefaultFilesDrag ~ value:', value)
-        //   setOrderDefaultFiles(value)
-        // }}
+        onChangeOrderDefaultFilesDrag={value => {
+          console.log('🚀 ~ onChangeOrderDefaultFilesDrag ~ value:', value)
+          setOrderDefaultFiles(value)
+        }}
         dropzoneOptions={{
           maxFiles: 10,
           maxSize: convertToBytes({ unit: 'MB', size: 1 })

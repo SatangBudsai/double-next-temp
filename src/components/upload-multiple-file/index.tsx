@@ -321,37 +321,65 @@ const UploadMultipleFile = <T extends FileObject>({
       />
 
       {/* Draggable and Sortable List */}
-      <DndContext
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-        modifiers={[restrictToParentElement]}
-        sensors={sensors}>
-        <SortableContext
-          items={transformedImages.map(file => file.fileName || file.order?.toString())}
-          strategy={verticalListSortingStrategy}>
-          <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
-            {transformedImages.length > 0 &&
-              transformedImages.map((file, index) => (
-                <SortableItem
-                  key={file.fileName || index.toString()}
-                  id={file.fileName || file.order?.toString()}
-                  index={index}
-                  file={file}
-                  initFiles={initFiles}
-                  onRemove={handleRemoveFiles}
-                  setIsOpen={setIsOpen}
-                  setStartingIndex={setStartingIndex}
-                />
-              ))}
-          </div>
-        </SortableContext>
-      </DndContext>
+      {isDrag ? (
+        <DndContext
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+          modifiers={[restrictToParentElement]}
+          sensors={sensors}>
+          <SortableContext
+            items={transformedImages.map(file => file.fileName || file.order?.toString())}
+            strategy={verticalListSortingStrategy}>
+            <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
+              {transformedImages.length > 0 &&
+                transformedImages.map((file, index) => (
+                  <SortableItem
+                    key={file.fileName || index.toString()}
+                    id={file.fileName || file.order?.toString()}
+                    index={index}
+                    file={file}
+                    initFiles={initFiles}
+                    onRemove={handleRemoveFiles}
+                    setIsOpen={setIsOpen}
+                    setStartingIndex={setStartingIndex}
+                  />
+                ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      ) : (
+        <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
+          {transformedImages.length > 0 &&
+            transformedImages.map((file, index) => (
+              <SortableItem
+                key={file.fileName || index.toString()}
+                id={file.fileName || file.order?.toString()}
+                index={index}
+                file={file}
+                initFiles={initFiles}
+                onRemove={handleRemoveFiles}
+                setIsOpen={setIsOpen}
+                setStartingIndex={setStartingIndex}
+                disableDrag // Pass a prop to disable dragging interactions
+              />
+            ))}
+        </div>
+      )}
     </Fragment>
   )
 }
 
 // SortableItem Component
-const SortableItem = ({ id, index, file, initFiles, onRemove, setIsOpen, setStartingIndex }: any) => {
+const SortableItem = ({
+  id,
+  index,
+  file,
+  initFiles,
+  onRemove,
+  setIsOpen,
+  setStartingIndex,
+  disableDrag = false
+}: any) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -364,8 +392,7 @@ const SortableItem = ({ id, index, file, initFiles, onRemove, setIsOpen, setStar
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
+      {...(!disableDrag && { ...attributes, ...listeners })}
       className='flex items-center justify-between gap-4 hover:bg-default/15'>
       <div
         className={cn('flex flex-1 items-center gap-2 hover:opacity-80', isImage && 'cursor-pointer')}

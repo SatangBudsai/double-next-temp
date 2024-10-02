@@ -13,6 +13,7 @@ import { getIconFileName } from '@/utils/upload-files/getIconFileName'
 
 import { DndContext, closestCenter } from '@dnd-kit/core'
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { restrictToParentElement } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
 
 interface FileObject {
@@ -197,7 +198,6 @@ const UploadMultipleFile = <T extends FileObject>({
 
   // Handle sorting logic
   const handleDragEnd = (event: any) => {
-    console.log('🚀 ~ handleDragEnd ~ event:', event)
     const { active, over } = event
 
     if (active.id !== over.id) {
@@ -208,7 +208,6 @@ const UploadMultipleFile = <T extends FileObject>({
 
       // Rearrange the items in new order
       const newAllItems = arrayMove(allItems, oldIndex, newIndex)
-      console.log('🚀 ~ handleDragEnd ~ newAllItems:', newAllItems)
       const newInitFiles: T[] = [...initFiles]
       const newUploadedFiles: { order: number; file: File }[] = [...uploadedFiles]
 
@@ -296,7 +295,7 @@ const UploadMultipleFile = <T extends FileObject>({
       )}
 
       {/* Draggable and Sortable List */}
-      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToParentElement]}>
         <SortableContext
           items={transformedImages.map(file => file.fileName || file.order.toString())}
           strategy={verticalListSortingStrategy}>

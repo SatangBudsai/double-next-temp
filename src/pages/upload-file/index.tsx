@@ -95,6 +95,7 @@ const UploadFile = (props: Props) => {
           setOrderDefaultFiles(value)
         }}
         onChangeOrderDefaultFilesDrag={value => {
+          console.log('🚀 ~ UploadFile ~ value:', value)
           setOrderDefaultFiles(value)
         }}
         dropzoneOptions={{

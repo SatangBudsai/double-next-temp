@@ -23,10 +23,11 @@ interface UploadMultipleFileProps<T> {
   srcImage?: (file: T) => string | undefined | null
   fileName?: (file: T) => string | undefined | null
   fileSize?: (file: T) => number | undefined | null
+  orderKey?: string
   isDrag?: boolean
-  onFilesSelect?: (files: { order: number; file: File }[]) => void
-  onDefaultFilesRemove?: (value: T[]) => void
-  onDefaultFilesDrag?: (value: T[]) => void
+  onSelectFiles?: (files: { order: number; file: File }[]) => void
+  onRemoveDefaultFiles?: (value: T[]) => void
+  onChangeOrderDefaultFilesDrag?: (value: T[]) => void
   dropzoneContent?: React.ReactNode
   dropzoneClassName?: string
   contentClassName?: string
@@ -35,11 +36,14 @@ interface UploadMultipleFileProps<T> {
 
 const UploadMultipleFile = <T extends FileObject>({
   defaultFiles = [],
-  onFilesSelect,
-  onDefaultFilesRemove,
   srcImage = file => file?.src,
   fileName = file => file?.alt,
   fileSize = file => file?.fileSize,
+  orderKey = 'orderNumber',
+  isDrag = false,
+  onSelectFiles,
+  onRemoveDefaultFiles,
+  onChangeOrderDefaultFilesDrag,
   dropzoneClassName,
   contentClassName,
   dropzoneContent,
@@ -51,6 +55,12 @@ const UploadMultipleFile = <T extends FileObject>({
   const [deleteFiles, setDeleteFiles] = useState<T[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [startingIndex, setStartingIndex] = useState(0)
+
+  useEffect(() => {
+    if (isDrag && !orderKey) {
+      throw new Error("The 'orderKey' must be set when 'isDrag' is true.")
+    }
+  }, [isDrag, orderKey])
 
   useEffect(() => {
     setInitFiles(defaultFiles)
@@ -144,7 +154,7 @@ const UploadMultipleFile = <T extends FileObject>({
 
     const newFiles = [...uploadedFiles, ...formatFileList]
     setUploadedFiles(newFiles)
-    onFilesSelect && onFilesSelect(newFiles)
+    onSelectFiles && onSelectFiles(newFiles)
 
     setErrors({})
   }
@@ -158,7 +168,7 @@ const UploadMultipleFile = <T extends FileObject>({
         setDeleteFiles(delFileList)
         const newFiles = initFiles.filter((_, i) => i !== index)
         setInitFiles(newFiles)
-        onDefaultFilesRemove && onDefaultFilesRemove(delFileList)
+        onRemoveDefaultFiles && onRemoveDefaultFiles(delFileList)
       }
     } else {
       // Remove from uploadedFiles

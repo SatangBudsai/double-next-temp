@@ -77,13 +77,13 @@ const UploadFile = (props: Props) => {
         fileName={file => file.fileName}
         fileSize={file => file.fileSize}
         isDrag={true}
-        onFilesSelect={value => {
+        onSelectFiles={value => {
           setUploadFiles(value.map(item => item.file))
         }}
-        onDefaultFilesRemove={value => {
+        onRemoveDefaultFiles={value => {
           setOrderDefaultFiles(value)
         }}
-        onDefaultFilesDrag={value => {
+        onChangeOrderDefaultFilesDrag={value => {
           setOrderDefaultFiles(value)
         }}
         dropzoneOptions={{

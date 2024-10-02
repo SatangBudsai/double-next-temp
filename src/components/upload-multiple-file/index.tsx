@@ -56,7 +56,6 @@ interface CommonProps<T> {
   fileSize?: (file: T) => number | undefined | null
   onSelectFiles?: (files: { order: number; file: File }[]) => void
   onRemoveDefaultFiles?: (value: T[]) => void
-  onChangeOrderDefaultFilesDrag?: (value: T[]) => void
   dropzoneContent?: React.ReactNode
   dropzoneClassName?: string
   contentClassName?: string
@@ -66,11 +65,13 @@ interface CommonProps<T> {
 interface UploadMultipleFileWithDragProps<T> extends CommonProps<T> {
   isDrag: true
   orderKey: keyof T // Required when isDrag is true
+  onChangeOrderDefaultFilesDrag: (value: T[]) => void
 }
 
 interface UploadMultipleFileWithoutDragProps<T> extends CommonProps<T> {
   isDrag?: false
   orderKey?: never // Not required or should be undefined
+  onChangeOrderDefaultFilesDrag?: never
 }
 
 type UploadMultipleFileProps<T> = UploadMultipleFileWithDragProps<T> | UploadMultipleFileWithoutDragProps<T>

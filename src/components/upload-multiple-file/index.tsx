@@ -402,6 +402,7 @@ const SortableItem = ({
             setStartingIndex(index)
           }
         }}>
+        {!disableDrag && <Icon icon='akar-icons:drag-vertical' width={20} />}
         {isImage ? (
           <Image
             src={file.src || '/images/@mock/300x200.jpg'}

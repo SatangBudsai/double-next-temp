@@ -11,6 +11,10 @@ import { fileNameFromUrl } from '@/utils/upload-files/fileNameFormUrl'
 import path from 'path'
 import { getIconFileName } from '@/utils/upload-files/getIconFileName'
 
+import { DndContext, closestCenter } from '@dnd-kit/core'
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
 interface FileObject {
   [key: string]: any
 }
@@ -18,12 +22,13 @@ interface FileObject {
 interface ErrorCategory {
   [category: string]: string[] // Each category is a list of error messages.
 }
+
 interface UploadMultipleFileProps<T> {
   defaultFiles: T[] | []
   srcImage?: (file: T) => string | undefined | null
   fileName?: (file: T) => string | undefined | null
   fileSize?: (file: T) => number | undefined | null
-  orderKey?: string
+  orderKey?: keyof T
   isDrag?: boolean
   onSelectFiles?: (files: { order: number; file: File }[]) => void
   onRemoveDefaultFiles?: (value: T[]) => void
@@ -40,7 +45,7 @@ const UploadMultipleFile = <T extends FileObject>({
   fileName = file => file?.alt,
   fileSize = file => file?.fileSize,
   orderKey = 'orderNumber',
-  isDrag = false,
+  isDrag = true,
   onSelectFiles,
   onRemoveDefaultFiles,
   onChangeOrderDefaultFilesDrag,
@@ -70,15 +75,17 @@ const UploadMultipleFile = <T extends FileObject>({
 
   const transformedDefaultImages = useMemo(() => {
     return initFiles.map(item => ({
+      order: item[orderKey] as number,
       src: srcImage(item) || '',
       fileName: fileName(item),
       isImage: isImageFile(fileNameFromUrl(srcImage(item) || '')),
       fileSize: fileSize(item)
     }))
-  }, [initFiles, srcImage, fileName, fileSize])
+  }, [initFiles, srcImage, fileName, fileSize, orderKey])
 
   const transformedSelectImages = useMemo(() => {
     return uploadedFiles.map(item => ({
+      order: item.order,
       src: URL.createObjectURL(item.file),
       fileName: item.file.name,
       isImage: item.file.type.startsWith('image/'),
@@ -87,7 +94,7 @@ const UploadMultipleFile = <T extends FileObject>({
   }, [uploadedFiles])
 
   const transformedImages = useMemo(() => {
-    return [...transformedDefaultImages, ...transformedSelectImages]
+    return [...transformedDefaultImages, ...transformedSelectImages].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
   }, [transformedDefaultImages, transformedSelectImages])
 
   const handleUploadFiles = (fileList: File[], rejectedFiles: FileRejection[]) => {
@@ -177,8 +184,23 @@ const UploadMultipleFile = <T extends FileObject>({
     }
   }
 
+  // Handle sorting logic
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event
+    if (active.id !== over.id) {
+      setInitFiles(items => {
+        const oldIndex = items.findIndex(item => item[orderKey] === active.id)
+        const newIndex = items.findIndex(item => item[orderKey] === over.id)
+        const sortedItems = arrayMove(items, oldIndex, newIndex)
+        onChangeOrderDefaultFilesDrag && onChangeOrderDefaultFilesDrag(sortedItems)
+        return sortedItems
+      })
+    }
+  }
+
   return (
     <Fragment>
+      {/* Dropzone Section Remains Unchanged */}
       <Dropzone onDrop={handleUploadFiles} {...dropzoneOptions}>
         {({ getRootProps, getInputProps, open }) => (
           <section>
@@ -204,7 +226,7 @@ const UploadMultipleFile = <T extends FileObject>({
         )}
       </Dropzone>
 
-      {/* Error Message */}
+      {/* Error Message Remains Unchanged */}
       {Object.keys(errors).length > 0 && (
         <div className='mt-2 rounded-lg bg-danger/10 p-5 text-danger'>
           <p className='text-lg font-semibold'>ไฟล์อัพโหลดไม่ตรงตามเงื่อนไขที่กำหนดดังนี้</p>
@@ -227,68 +249,84 @@ const UploadMultipleFile = <T extends FileObject>({
         </div>
       )}
 
-      {/* Display uploaded and initial files */}
-      <SlideshowLightbox
-        lightboxIdentifier='lightBoxUploadMultipleFile'
-        images={transformedImages.filter(file => file.isImage)}
-        open={isOpen}
-        startingSlideIndex={startingIndex}
-        showThumbnails={true}
-        onClose={() => setIsOpen(false)}
-        modalClose={'clickOutside'}
-        backgroundColor='rgba(255, 255, 255, 0.8)'
-      />
-
-      <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
-        {transformedImages.length > 0 &&
-          transformedImages.map((file, index) => {
-            const isImage = file.isImage
-
-            return (
-              <div className='flex items-center justify-between gap-4 hover:bg-default/15' key={index}>
-                <div
-                  className={cn('flex flex-1 items-center gap-2 hover:opacity-80', isImage && 'cursor-pointer')}
-                  onClick={() => {
-                    if (isImage) {
-                      setIsOpen(true)
-                      setStartingIndex(index)
-                    }
-                  }}>
-                  {isImage ? (
-                    <Image
-                      src={file.src || '/images/@mock/300x200.jpg'}
-                      alt={file.fileName || ''}
-                      radius='sm'
-                      className='h-11 w-14 object-cover'
-                    />
-                  ) : (
-                    <Icon icon={getIconFileName(file.fileName as string)} width={40} className='w-14 text-primary' />
-                  )}
-                  <div className='flex flex-1 flex-col'>
-                    <p className='flex-1 truncate text-nowrap'>{file.fileName}</p>
-                    <div className='flex gap-1'>
-                      <Icon
-                        icon='solar:check-circle-bold-duotone'
-                        className={cn(index < initFiles.length ? 'text-success' : 'text-default-400')}
-                      />
-                      <p className='text-sm text-default-500'>
-                        {file.fileSize
-                          ? formatFileSize(file.fileSize)
-                          : file.fileSize === 0
-                            ? 'ไม่พบไฟล์'
-                            : 'อัพโหลดเเล้ว'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <Button size='sm' color='danger' variant='bordered' isIconOnly onPress={() => handleRemoveFiles(index)}>
-                  <Icon icon='solar:close-square-bold' width={20} />
-                </Button>
-              </div>
-            )
-          })}
-      </div>
+      {/* Draggable and Sortable List */}
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext
+          items={transformedImages.map(file => file.fileName || file.order.toString())}
+          strategy={verticalListSortingStrategy}>
+          <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
+            {transformedImages.length > 0 &&
+              transformedImages.map((file, index) => (
+                <SortableItem
+                  key={file.fileName || index.toString()}
+                  id={file.fileName || file.order.toString()}
+                  index={index}
+                  file={file}
+                  initFiles={initFiles}
+                  onRemove={handleRemoveFiles}
+                  setIsOpen={setIsOpen}
+                  setStartingIndex={setStartingIndex}
+                />
+              ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     </Fragment>
+  )
+}
+
+// SortableItem Component
+const SortableItem = ({ id, index, file, initFiles, onRemove, setIsOpen, setStartingIndex }: any) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  }
+
+  const isImage = file.isImage
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className='flex items-center justify-between gap-4 hover:bg-default/15'>
+      <div
+        className={cn('flex flex-1 items-center gap-2 hover:opacity-80', isImage && 'cursor-pointer')}
+        onClick={() => {
+          if (isImage) {
+            setIsOpen(true)
+            setStartingIndex(index)
+          }
+        }}>
+        {isImage ? (
+          <Image
+            src={file.src || '/images/@mock/300x200.jpg'}
+            alt={file.fileName || ''}
+            radius='sm'
+            className='h-11 w-14 object-cover'
+          />
+        ) : (
+          <Icon icon={getIconFileName(file.fileName as string)} width={40} className='w-14 text-primary' />
+        )}
+        <div className='flex flex-1 flex-col'>
+          <p className='flex-1 truncate text-nowrap'>{file.fileName}</p>
+          <div className='flex gap-1'>
+            <Icon
+              icon='solar:check-circle-bold-duotone'
+              className={cn(index < initFiles.length ? 'text-success' : 'text-default-400')}
+            />
+            <p className='text-sm text-default-500'>
+              {file.fileSize ? formatFileSize(file.fileSize) : file.fileSize === 0 ? 'ไม่พบไฟล์' : 'อัพโหลดเเล้ว'}
+            </p>
+          </div>
+        </div>
+      </div>
+      <Button size='sm' color='danger' variant='bordered' isIconOnly onPress={() => onRemove(index)}>
+        <Icon icon='solar:close-square-bold' width={20} />
+      </Button>
+    </div>
   )
 }
 

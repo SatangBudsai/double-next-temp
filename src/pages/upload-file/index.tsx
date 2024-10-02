@@ -22,6 +22,16 @@ type ItemsType = {
   fileName: string
   fileSize: number
   order: number
+  bbb?: {
+    c?: number
+    ccc?: number
+  }
+  aaa?: {
+    c?: number
+    eee?: {
+      vv?: string
+    }
+  }
 }
 
 const items: ItemsType[] = [
@@ -77,6 +87,7 @@ const UploadFile = (props: Props) => {
         fileName={file => file.fileName}
         fileSize={file => file.fileSize}
         isDrag={true}
+        orderKey='bbb'
         onSelectFiles={value => {
           setUploadFiles(value.map(item => item.file))
         }}

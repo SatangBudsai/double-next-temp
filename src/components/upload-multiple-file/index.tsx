@@ -33,13 +33,27 @@ interface TransformedImagesType {
   fileSize: number | null | undefined
 }
 
-interface UploadMultipleFileProps<T> {
+// interface UploadMultipleFileProps<T> {
+//   defaultFiles: T[] | []
+//   srcImage?: (file: T) => string | undefined | null
+//   fileName?: (file: T) => string | undefined | null
+//   fileSize?: (file: T) => number | undefined | null
+//   orderKey?: keyof T
+//   isDrag?: boolean
+//   onSelectFiles?: (files: { order: number; file: File }[]) => void
+//   onRemoveDefaultFiles?: (value: T[]) => void
+//   onChangeOrderDefaultFilesDrag?: (value: T[]) => void
+//   dropzoneContent?: React.ReactNode
+//   dropzoneClassName?: string
+//   contentClassName?: string
+//   dropzoneOptions?: DropzoneOptions
+// }
+
+interface CommonProps<T> {
   defaultFiles: T[] | []
   srcImage?: (file: T) => string | undefined | null
   fileName?: (file: T) => string | undefined | null
   fileSize?: (file: T) => number | undefined | null
-  orderKey?: keyof T
-  isDrag?: boolean
   onSelectFiles?: (files: { order: number; file: File }[]) => void
   onRemoveDefaultFiles?: (value: T[]) => void
   onChangeOrderDefaultFilesDrag?: (value: T[]) => void
@@ -48,6 +62,18 @@ interface UploadMultipleFileProps<T> {
   contentClassName?: string
   dropzoneOptions?: DropzoneOptions
 }
+
+interface UploadMultipleFileWithDragProps<T> extends CommonProps<T> {
+  isDrag: true
+  orderKey: keyof T // Required when isDrag is true
+}
+
+interface UploadMultipleFileWithoutDragProps<T> extends CommonProps<T> {
+  isDrag?: false
+  orderKey?: never // Not required or should be undefined
+}
+
+type UploadMultipleFileProps<T> = UploadMultipleFileWithDragProps<T> | UploadMultipleFileWithoutDragProps<T>
 
 const UploadMultipleFile = <T extends FileObject>({
   defaultFiles = [],

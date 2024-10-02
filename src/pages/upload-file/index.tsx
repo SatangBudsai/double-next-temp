@@ -92,7 +92,7 @@ const UploadFile = (props: Props) => {
         }}
         dropzoneOptions={{
           maxFiles: 10,
-          maxSize: convertToBytes({ size: 1, unit: 'MB' })
+          maxSize: convertToBytes({ size: 5, unit: 'MB' })
         }}
       />
     </Fragment>

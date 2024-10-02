@@ -38,7 +38,7 @@ interface UploadMultipleFileProps<T> {
   srcImage?: (file: T) => string | undefined | null
   fileName?: (file: T) => string | undefined | null
   fileSize?: (file: T) => number | undefined | null
-  orderKey?: keyof T
+  orderBy?: keyof T
   isDrag?: boolean
   onSelectFiles?: (files: { order: number; file: File }[]) => void
   onRemoveDefaultFiles?: (value: T[]) => void
@@ -54,7 +54,7 @@ const UploadMultipleFile = <T extends FileObject>({
   srcImage = file => file?.src,
   fileName = file => file?.alt,
   fileSize = file => file?.fileSize,
-  orderKey = 'order',
+  orderBy = 'order',
   isDrag = false,
   onSelectFiles,
   onRemoveDefaultFiles,
@@ -72,10 +72,10 @@ const UploadMultipleFile = <T extends FileObject>({
   const [startingIndex, setStartingIndex] = useState(0)
 
   useEffect(() => {
-    if (isDrag && !orderKey) {
-      throw new Error("The 'orderKey' must be set when 'isDrag' is true.")
+    if (isDrag && !orderBy) {
+      throw new Error("The 'orderBy' must be set when 'isDrag' is true.")
     }
-  }, [isDrag, orderKey])
+  }, [isDrag, orderBy])
 
   useEffect(() => {
     setInitFiles(defaultFiles)
@@ -86,13 +86,13 @@ const UploadMultipleFile = <T extends FileObject>({
   const transformedDefaultImages = useMemo<TransformedImagesType[]>(() => {
     return initFiles.map(item => ({
       isDefaultFile: true,
-      order: item[orderKey] as number,
+      order: item[orderBy] as number,
       src: srcImage(item) || '',
       fileName: fileName(item),
       isImage: isImageFile(fileNameFromUrl(srcImage(item) || '')),
       fileSize: fileSize(item)
     }))
-  }, [initFiles, srcImage, fileName, fileSize, orderKey])
+  }, [initFiles, srcImage, fileName, fileSize, orderBy])
 
   const transformedSelectImages = useMemo<TransformedImagesType[]>(() => {
     return uploadedFiles.map(item => ({
@@ -233,7 +233,7 @@ const UploadMultipleFile = <T extends FileObject>({
           if (initFileIndex !== -1) {
             newInitFiles[initFileIndex] = {
               ...newInitFiles[initFileIndex],
-              [orderKey]: index
+              [orderBy]: index
             }
           }
         } else {

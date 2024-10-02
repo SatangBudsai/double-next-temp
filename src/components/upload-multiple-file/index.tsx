@@ -23,6 +23,15 @@ interface ErrorCategory {
   [category: string]: string[] // Each category is a list of error messages.
 }
 
+interface TransformedImagesType {
+  isDefaultFile: boolean
+  order: number
+  src: string
+  fileName: string | null | undefined
+  isImage: boolean
+  fileSize: number | null | undefined
+}
+
 interface UploadMultipleFileProps<T> {
   defaultFiles: T[] | []
   srcImage?: (file: T) => string | undefined | null
@@ -73,8 +82,9 @@ const UploadMultipleFile = <T extends FileObject>({
     setDeleteFiles([])
   }, [defaultFiles])
 
-  const transformedDefaultImages = useMemo(() => {
+  const transformedDefaultImages = useMemo<TransformedImagesType[]>(() => {
     return initFiles.map(item => ({
+      isDefaultFile: true,
       order: item[orderKey] as number,
       src: srcImage(item) || '',
       fileName: fileName(item),
@@ -83,8 +93,9 @@ const UploadMultipleFile = <T extends FileObject>({
     }))
   }, [initFiles, srcImage, fileName, fileSize, orderKey])
 
-  const transformedSelectImages = useMemo(() => {
+  const transformedSelectImages = useMemo<TransformedImagesType[]>(() => {
     return uploadedFiles.map(item => ({
+      isDefaultFile: false,
       order: item.order,
       src: URL.createObjectURL(item.file),
       fileName: item.file.name,
@@ -93,7 +104,7 @@ const UploadMultipleFile = <T extends FileObject>({
     }))
   }, [uploadedFiles])
 
-  const transformedImages = useMemo(() => {
+  const transformedImages = useMemo<TransformedImagesType[]>(() => {
     return [...transformedDefaultImages, ...transformedSelectImages].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
   }, [transformedDefaultImages, transformedSelectImages])
 
@@ -156,7 +167,7 @@ const UploadMultipleFile = <T extends FileObject>({
 
     let formatFileList: { order: number; file: File }[] = []
     fileList.forEach((file, index) => {
-      formatFileList.push({ file: file, order: index })
+      formatFileList.push({ file: file, order: transformedImages.length + index })
     })
 
     const newFiles = [...uploadedFiles, ...formatFileList]
@@ -186,15 +197,50 @@ const UploadMultipleFile = <T extends FileObject>({
 
   // Handle sorting logic
   const handleDragEnd = (event: any) => {
+    console.log('🚀 ~ handleDragEnd ~ event:', event)
     const { active, over } = event
+
     if (active.id !== over.id) {
-      setInitFiles(items => {
-        const oldIndex = items.findIndex(item => item[orderKey] === active.id)
-        const newIndex = items.findIndex(item => item[orderKey] === over.id)
-        const sortedItems = arrayMove(items, oldIndex, newIndex)
-        onChangeOrderDefaultFilesDrag && onChangeOrderDefaultFilesDrag(sortedItems)
-        return sortedItems
+      // Get the old and new indices for all items
+      const allItems = [...transformedImages]
+      const oldIndex = allItems.findIndex(item => item.fileName === active.id)
+      const newIndex = allItems.findIndex(item => item.fileName === over.id)
+
+      // Rearrange the items in new order
+      const newAllItems = arrayMove(allItems, oldIndex, newIndex)
+      console.log('🚀 ~ handleDragEnd ~ newAllItems:', newAllItems)
+      const newInitFiles: T[] = [...initFiles]
+      const newUploadedFiles: { order: number; file: File }[] = [...uploadedFiles]
+
+      // Update order for each item in newAllItems
+      newAllItems.forEach((item, index) => {
+        if (item.isDefaultFile) {
+          // Update order in initFiles
+          const initFileIndex = newInitFiles.findIndex(itemInit => fileName(itemInit) === item.fileName)
+          if (initFileIndex !== -1) {
+            newInitFiles[initFileIndex] = {
+              ...newInitFiles[initFileIndex],
+              [orderKey]: index
+            }
+          }
+        } else {
+          // Update order in uploadedFiles
+          const uploadedFileIndex = newUploadedFiles.findIndex(uploaded => uploaded.file.name === item.fileName)
+          if (uploadedFileIndex !== -1) {
+            newUploadedFiles[uploadedFileIndex] = {
+              ...newUploadedFiles[uploadedFileIndex],
+              order: index
+            }
+          }
+        }
       })
+
+      // Update state
+      setInitFiles(newInitFiles)
+      setUploadedFiles(newUploadedFiles)
+
+      // Trigger callback if provided
+      onChangeOrderDefaultFilesDrag && onChangeOrderDefaultFilesDrag(newInitFiles)
     }
   }
 
@@ -315,7 +361,7 @@ const SortableItem = ({ id, index, file, initFiles, onRemove, setIsOpen, setStar
           <div className='flex gap-1'>
             <Icon
               icon='solar:check-circle-bold-duotone'
-              className={cn(index < initFiles.length ? 'text-success' : 'text-default-400')}
+              className={cn(file.isDefaultFile ? 'text-success' : 'text-default-400')}
             />
             <p className='text-sm text-default-500'>
               {file.fileSize ? formatFileSize(file.fileSize) : file.fileSize === 0 ? 'ไม่พบไฟล์' : 'อัพโหลดเเล้ว'}

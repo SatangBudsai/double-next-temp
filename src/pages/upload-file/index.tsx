@@ -87,7 +87,7 @@ const UploadFile = (props: Props) => {
         fileName={file => file.fileName}
         fileSize={file => file.fileSize}
         isDrag={true}
-        orderKey='bbb'
+        orderKey='order'
         onSelectFiles={value => {
           setUploadFiles(value.map(item => item.file))
         }}

@@ -54,8 +54,8 @@ const UploadMultipleFile = <T extends FileObject>({
   srcImage = file => file?.src,
   fileName = file => file?.alt,
   fileSize = file => file?.fileSize,
-  orderKey = 'orderNumber',
-  isDrag = true,
+  orderKey = 'order',
+  isDrag = false,
   onSelectFiles,
   onRemoveDefaultFiles,
   onChangeOrderDefaultFilesDrag,
@@ -254,6 +254,7 @@ const UploadMultipleFile = <T extends FileObject>({
 
       // Trigger callback if provided
       onChangeOrderDefaultFilesDrag && onChangeOrderDefaultFilesDrag(newInitFiles)
+      onSelectFiles && onSelectFiles(newUploadedFiles)
     }
   }
 
@@ -326,14 +327,14 @@ const UploadMultipleFile = <T extends FileObject>({
         modifiers={[restrictToParentElement]}
         sensors={sensors}>
         <SortableContext
-          items={transformedImages.map(file => file.fileName || file.order.toString())}
+          items={transformedImages.map(file => file.fileName || file.order?.toString())}
           strategy={verticalListSortingStrategy}>
           <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
             {transformedImages.length > 0 &&
               transformedImages.map((file, index) => (
                 <SortableItem
                   key={file.fileName || index.toString()}
-                  id={file.fileName || file.order.toString()}
+                  id={file.fileName || file.order?.toString()}
                   index={index}
                   file={file}
                   initFiles={initFiles}
@@ -382,10 +383,14 @@ const SortableItem = ({ id, index, file, initFiles, onRemove, setIsOpen, setStar
             className='h-11 w-14 object-cover'
           />
         ) : (
-          <Icon icon={getIconFileName(file.fileName as string)} width={40} className='w-14 text-primary' />
+          <Icon
+            icon={file.fileName ? getIconFileName(file.fileName as string) : 'emojione-v1:warning'}
+            width={40}
+            className='w-14 text-primary'
+          />
         )}
         <div className='flex flex-1 flex-col'>
-          <p className='flex-1 truncate text-nowrap'>{file.fileName}</p>
+          <p className='flex-1 truncate text-nowrap'>{file.fileName || 'ไม่ได้ระบุ'}</p>
           <div className='flex gap-1'>
             <Icon
               icon='solar:check-circle-bold-duotone'

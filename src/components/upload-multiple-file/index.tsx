@@ -11,7 +11,7 @@ import { fileNameFromUrl } from '@/utils/upload-files/fileNameFormUrl'
 import path from 'path'
 import { getIconFileName } from '@/utils/upload-files/getIconFileName'
 
-import { DndContext, closestCenter } from '@dnd-kit/core'
+import { DndContext, closestCenter, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { restrictToParentElement } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
@@ -196,6 +196,20 @@ const UploadMultipleFile = <T extends FileObject>({
     }
   }
 
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 10 // Drag will only activate if moved 10 pixels or more
+    }
+  })
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      distance: 10 // Same for touch devices
+    }
+  })
+
+  const sensors = useSensors(mouseSensor, touchSensor)
+
   // Handle sorting logic
   const handleDragEnd = (event: any) => {
     const { active, over } = event
@@ -294,8 +308,23 @@ const UploadMultipleFile = <T extends FileObject>({
         </div>
       )}
 
+      <SlideshowLightbox
+        lightboxIdentifier='lightBoxUploadMultipleFile'
+        images={transformedImages.filter(file => file.isImage)}
+        open={isOpen}
+        startingSlideIndex={startingIndex}
+        showThumbnails={true}
+        onClose={() => setIsOpen(false)}
+        modalClose={'clickOutside'}
+        backgroundColor='rgba(255, 255, 255, 0.8)'
+      />
+
       {/* Draggable and Sortable List */}
-      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToParentElement]}>
+      <DndContext
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToParentElement]}
+        sensors={sensors}>
         <SortableContext
           items={transformedImages.map(file => file.fileName || file.order.toString())}
           strategy={verticalListSortingStrategy}>

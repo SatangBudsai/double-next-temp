@@ -24,6 +24,10 @@ type ItemsType = {
   order: number
 }
 
+interface ProgressType {
+  [key: string]: number // ใช้เพื่อเก็บเปอร์เซ็นต์ของแต่ละไฟล์ โดยมี key เป็นชื่อไฟล์
+}
+
 const items: ItemsType[] = [
   {
     pathURL: 'https://pixlr.com/images/generator/text-to-image.webp',
@@ -65,10 +69,11 @@ const UploadFile = (props: Props) => {
   const [uploadFiles, setUploadFiles] = useState<File[]>([])
   const [defaultFilesRemove, setDefaultFilesRemove] = useState<ItemsType[]>([])
   const [orderDefaultFiles, setOrderDefaultFiles] = useState<ItemsType[]>([])
+  const [progress, setProgress] = useState<ProgressType>({})
 
   return (
     <Fragment>
-      <UploadSingleFile />
+      {/* <UploadSingleFile /> */}
 
       <Spacer y={5} />
       <UploadMultipleFile
@@ -76,6 +81,7 @@ const UploadFile = (props: Props) => {
         srcImage={file => file.pathURL}
         fileName={file => file.fileName}
         fileSize={file => file.fileSize}
+        groupUploadStatus={true}
         isDrag={true}
         orderKey='order'
         onSelectFiles={value => {
@@ -92,7 +98,7 @@ const UploadFile = (props: Props) => {
         }}
         dropzoneOptions={{
           maxFiles: 10,
-          maxSize: convertToBytes({ size: 5, unit: 'MB' })
+          maxSize: convertToBytes({ size: 20, unit: 'MB' })
         }}
       />
     </Fragment>

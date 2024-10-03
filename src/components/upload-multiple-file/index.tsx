@@ -1,6 +1,6 @@
 import { cn } from '@/utils/cn'
 import { Icon } from '@iconify/react'
-import { Button, Image } from '@nextui-org/react'
+import { Button, Divider, Image, Progress, Spacer } from '@nextui-org/react'
 import { SlideshowLightbox } from 'lightbox.js-react'
 import React, { useState, useEffect, Fragment, useMemo } from 'react'
 import Dropzone, { DropzoneOptions, FileRejection } from 'react-dropzone'
@@ -56,6 +56,7 @@ interface CommonProps<T> {
   fileSize?: (file: T) => number | undefined | null
   onSelectFiles?: (files: { order: number; file: File }[]) => void
   onRemoveDefaultFiles?: (value: T[]) => void
+  groupUploadStatus?: boolean
   dropzoneContent?: React.ReactNode
   dropzoneClassName?: string
   contentClassName?: string
@@ -86,6 +87,7 @@ const UploadMultipleFile = <T extends FileObject>({
   onSelectFiles,
   onRemoveDefaultFiles,
   onChangeOrderDefaultFilesDrag,
+  groupUploadStatus = false,
   dropzoneClassName,
   contentClassName,
   dropzoneContent,
@@ -212,8 +214,10 @@ const UploadMultipleFile = <T extends FileObject>({
       if (delFile) {
         const delFileList = [...deleteFiles, delFile]
         setDeleteFiles(delFileList)
+
         const newFiles = initFiles.filter((_, i) => i !== index)
         setInitFiles(newFiles)
+
         onRemoveDefaultFiles && onRemoveDefaultFiles(delFileList)
       }
     } else {
@@ -274,6 +278,10 @@ const UploadMultipleFile = <T extends FileObject>({
           }
         }
       })
+
+      // Sort
+      newInitFiles.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      newUploadedFiles.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
 
       // Update state
       setInitFiles(newInitFiles)
@@ -348,50 +356,85 @@ const UploadMultipleFile = <T extends FileObject>({
       />
 
       {/* Draggable and Sortable List */}
-      {isDrag ? (
-        <DndContext
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-          modifiers={[restrictToParentElement]}
-          sensors={sensors}>
-          <SortableContext
-            items={transformedImages.map(file => file.fileName || file.order?.toString())}
-            strategy={verticalListSortingStrategy}>
-            <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
-              {transformedImages.length > 0 &&
-                transformedImages.map((file, index) => (
-                  <SortableItem
-                    key={file.fileName || index.toString()}
-                    id={file.fileName || file.order?.toString()}
-                    index={index}
-                    file={file}
-                    initFiles={initFiles}
-                    onRemove={handleRemoveFiles}
-                    setIsOpen={setIsOpen}
-                    setStartingIndex={setStartingIndex}
-                  />
-                ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-      ) : (
-        <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
-          {transformedImages.length > 0 &&
-            transformedImages.map((file, index) => (
-              <SortableItem
-                key={file.fileName || index.toString()}
-                id={file.fileName || file.order?.toString()}
-                index={index}
-                file={file}
-                initFiles={initFiles}
-                onRemove={handleRemoveFiles}
-                setIsOpen={setIsOpen}
-                setStartingIndex={setStartingIndex}
-                disableDrag // Pass a prop to disable dragging interactions
-              />
-            ))}
-        </div>
-      )}
+      <DndContext
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToParentElement]}
+        sensors={sensors}>
+        <SortableContext
+          disabled={!isDrag}
+          items={transformedImages.map(file => file.fileName || file.order?.toString())}
+          strategy={verticalListSortingStrategy}>
+          <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
+            {groupUploadStatus ? (
+              <Fragment>
+                {transformedImages.filter(item => item.isDefaultFile).length > 0 && (
+                  <Fragment>
+                    {transformedImages
+                      .filter(item => item.isDefaultFile)
+                      .map((file, index) => (
+                        <SortableItem
+                          key={file.fileName || index.toString()}
+                          id={file.fileName || file.order?.toString()}
+                          index={index}
+                          file={file}
+                          initFiles={initFiles}
+                          onRemove={handleRemoveFiles}
+                          setIsOpen={setIsOpen}
+                          setStartingIndex={setStartingIndex}
+                          disableDrag={!isDrag}
+                        />
+                      ))}
+                  </Fragment>
+                )}
+                {transformedImages.filter(item => !item.isDefaultFile).length > 0 && (
+                  <Fragment>
+                    <Spacer y={2} />
+                    <Divider />
+                    <p className='text font-medium'>ยังไม่ได้อัพโหลด</p>
+                    {transformedImages
+                      .filter(item => !item.isDefaultFile)
+                      .map((file, index) => (
+                        <SortableItem
+                          key={file.fileName || index.toString()}
+                          id={file.fileName || file.order?.toString()}
+                          index={index}
+                          file={file}
+                          initFiles={initFiles}
+                          onRemove={handleRemoveFiles}
+                          setIsOpen={setIsOpen}
+                          setStartingIndex={setStartingIndex}
+                          disableDrag={!isDrag}
+                        />
+                      ))}
+                  </Fragment>
+                )}
+              </Fragment>
+            ) : (
+              <Fragment>
+                {transformedImages.length > 0 && (
+                  <Fragment>
+                    <p className='text font-medium'>อัพโหลดเเล้ว</p>
+                    {transformedImages.map((file, index) => (
+                      <SortableItem
+                        key={file.fileName || index.toString()}
+                        id={file.fileName || file.order?.toString()}
+                        index={index}
+                        file={file}
+                        initFiles={initFiles}
+                        onRemove={handleRemoveFiles}
+                        setIsOpen={setIsOpen}
+                        setStartingIndex={setStartingIndex}
+                        disableDrag={!isDrag}
+                      />
+                    ))}
+                  </Fragment>
+                )}
+              </Fragment>
+            )}
+          </div>
+        </SortableContext>
+      </DndContext>
     </Fragment>
   )
 }
@@ -446,7 +489,7 @@ const SortableItem = ({
         )}
         <div className='flex flex-1 flex-col'>
           <p className='flex-1 truncate text-nowrap'>{file.fileName || 'ไม่ได้ระบุ'}</p>
-          <div className='flex gap-1'>
+          <div className='flex items-center gap-1'>
             <Icon
               icon='solar:check-circle-bold-duotone'
               className={cn(file.isDefaultFile ? 'text-success' : 'text-default-400')}
@@ -454,11 +497,14 @@ const SortableItem = ({
             <p className='text-sm text-default-500'>
               {file.fileSize ? formatFileSize(file.fileSize) : file.fileSize === 0 ? 'ไม่พบไฟล์' : 'อัพโหลดเเล้ว'}
             </p>
+            {/* {!file.isDefaultFile && (
+              <Progress color='success' aria-label='Loading...' value={0} className='flex-1' size='md' />
+            )} */}
           </div>
         </div>
       </div>
       <Button size='sm' color='danger' variant='bordered' isIconOnly onPress={() => onRemove(index)}>
-        <Icon icon='solar:close-square-bold' width={20} />
+        <Icon icon='solar:trash-bin-2-bold-duotone' width={20} />
       </Button>
     </div>
   )

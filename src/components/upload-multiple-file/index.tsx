@@ -42,7 +42,7 @@ interface UploadMultipleFileProps<T> {
   isDrag?: boolean
   onSelectFiles?: (files: { order: number; file: File }[]) => void
   onRemoveDefaultFiles?: (value: T[]) => void
-  onChangeOrderDefaultFiles: (value: T[]) => void
+  onChangeOrderDefaultFiles?: (value: T[]) => void
   dropzoneContent?: React.ReactNode
   dropzoneClassName?: string
   contentClassName?: string
@@ -203,7 +203,8 @@ const UploadMultipleFile = <T extends FileObject>({
 
     setInitFiles(filteredInitFiles)
     setUploadedFiles(filteredUploadedFiles)
-    onChangeOrderDefaultFiles(filteredInitFiles)
+    onChangeOrderDefaultFiles && onChangeOrderDefaultFiles(filteredInitFiles)
+    onSelectFiles && onSelectFiles(filteredUploadedFiles)
   }
 
   const handleRemoveFiles = (file: TransformedImagesType) => {

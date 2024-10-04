@@ -94,6 +94,7 @@ const UploadFile = (props: Props) => {
           maxFiles: 10,
           maxSize: convertToBytes({ size: 100, unit: 'MB' })
         }}
+        maxTotalSize={convertToBytes({ size: 10, unit: 'MB' })}
       />
     </Fragment>
   )

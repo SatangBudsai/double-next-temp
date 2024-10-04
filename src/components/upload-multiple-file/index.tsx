@@ -48,6 +48,7 @@ interface UploadMultipleFileProps<T> {
   contentClassName?: string
   dropzoneOptions?: DropzoneOptions
   hiddenDropzone?: boolean
+  maxTotalSize?: number
 }
 
 const UploadMultipleFile = <T extends FileObject>({
@@ -64,7 +65,8 @@ const UploadMultipleFile = <T extends FileObject>({
   contentClassName,
   dropzoneContent,
   dropzoneOptions,
-  hiddenDropzone
+  hiddenDropzone,
+  maxTotalSize
 }: UploadMultipleFileProps<T>) => {
   const [errors, setErrors] = useState<ErrorCategory>({})
   const [initFiles, setInitFiles] = useState<T[]>([])
@@ -114,7 +116,8 @@ const UploadMultipleFile = <T extends FileObject>({
       duplicateFiles: [],
       oversizedFiles: [],
       unsupportedFiles: [],
-      maxFilesExceeded: []
+      maxFilesExceeded: [],
+      maxTotalSizeExceeded: []
     }
 
     // Check for duplicate filenames
@@ -152,12 +155,28 @@ const UploadMultipleFile = <T extends FileObject>({
       })
     }
 
+    // Check total size against maxTotalSize
+    if (maxTotalSize) {
+      const existingTotalSize =
+        uploadedFiles.reduce((acc, curr) => acc + curr.file.size, 0) +
+        initFiles.reduce((acc, curr) => acc + (fileSize(curr) || 0), 0)
+      const newFilesTotalSize = fileList.reduce((acc, curr) => acc + curr.size, 0)
+      const totalSize = existingTotalSize + newFilesTotalSize
+
+      if (totalSize > maxTotalSize) {
+        errorCategories.maxTotalSizeExceeded.push(
+          `ขนาดไฟล์รวมเกินกำหนด: ${formatFileSize(totalSize)}, จำกัดที่ ${formatFileSize(maxTotalSize)}`
+        )
+      }
+    }
+
     // Set the categorized errors or clear errors if no errors exist
     if (
       errorCategories.duplicateFiles.length > 0 ||
       errorCategories.oversizedFiles.length > 0 ||
       errorCategories.unsupportedFiles.length > 0 ||
-      errorCategories.maxFilesExceeded.length > 0
+      errorCategories.maxFilesExceeded.length > 0 ||
+      errorCategories.maxTotalSizeExceeded.length > 0
     ) {
       setErrors(errorCategories)
       return

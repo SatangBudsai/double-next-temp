@@ -86,13 +86,13 @@ const UploadFile = (props: Props) => {
           console.log('🚀 ~ onRemoveDefaultFiles ~ value:', value)
           setDefaultFilesRemove(value)
         }}
-        onChangeOrderDefaultFilesDrag={value => {
+        onChangeOrderDefaultFiles={value => {
           console.log('🚀 ~ onChangeOrderDefaultFilesDrag ~ value:', value)
           setOrderDefaultFiles(value)
         }}
         dropzoneOptions={{
           maxFiles: 10,
-          maxSize: convertToBytes({ size: 1, unit: 'MB' })
+          maxSize: convertToBytes({ size: 100, unit: 'MB' })
         }}
       />
     </Fragment>

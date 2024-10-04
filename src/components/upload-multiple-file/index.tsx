@@ -38,11 +38,11 @@ interface UploadMultipleFileProps<T> {
   srcImage?: (file: T) => string | undefined | null
   fileName?: (file: T) => string | undefined | null
   fileSize?: (file: T) => number | undefined | null
-  orderKey?: keyof T
+  orderKey: keyof T
   isDrag?: boolean
   onSelectFiles?: (files: { order: number; file: File }[]) => void
   onRemoveDefaultFiles?: (value: T[]) => void
-  onChangeOrderDefaultFilesDrag?: (value: T[]) => void
+  onChangeOrderDefaultFiles: (value: T[]) => void
   dropzoneContent?: React.ReactNode
   dropzoneClassName?: string
   contentClassName?: string
@@ -54,11 +54,11 @@ const UploadMultipleFile = <T extends FileObject>({
   srcImage = file => file?.src,
   fileName = file => file?.alt,
   fileSize = file => file?.fileSize,
-  orderKey = 'order',
+  orderKey,
   isDrag = false,
   onSelectFiles,
   onRemoveDefaultFiles,
-  onChangeOrderDefaultFilesDrag,
+  onChangeOrderDefaultFiles,
   dropzoneClassName,
   contentClassName,
   dropzoneContent,
@@ -70,12 +70,6 @@ const UploadMultipleFile = <T extends FileObject>({
   const [deleteFiles, setDeleteFiles] = useState<T[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [startingIndex, setStartingIndex] = useState(0)
-
-  useEffect(() => {
-    if (isDrag && !orderKey) {
-      throw new Error("The 'orderKey' must be set when 'isDrag' is true.")
-    }
-  }, [isDrag, orderKey])
 
   useEffect(() => {
     setInitFiles(defaultFiles)
@@ -106,7 +100,10 @@ const UploadMultipleFile = <T extends FileObject>({
   }, [uploadedFiles])
 
   const transformedImages = useMemo<TransformedImagesType[]>(() => {
-    return [...transformedDefaultImages, ...transformedSelectImages].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    const transformedFilesList = [...transformedDefaultImages, ...transformedSelectImages].sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0)
+    )
+    return transformedFilesList
   }, [transformedDefaultImages, transformedSelectImages])
 
   const handleUploadFiles = (fileList: File[], rejectedFiles: FileRejection[]) => {
@@ -132,7 +129,6 @@ const UploadMultipleFile = <T extends FileObject>({
     }
 
     if (dropzoneOptions) {
-      // Check for maximum file count
       if (
         dropzoneOptions.maxFiles &&
         fileList.length + uploadedFiles.length + initFiles.length > dropzoneOptions.maxFiles
@@ -140,7 +136,6 @@ const UploadMultipleFile = <T extends FileObject>({
         errorCategories.maxFilesExceeded.push(`คุณสามารถอัปโหลดได้สูงสุด ${dropzoneOptions.maxFiles} ไฟล์`)
       }
 
-      // Check for rejected files due to size and type
       rejectedFiles.forEach(rejection => {
         rejection.errors.forEach(error => {
           if (error.code === 'file-too-large') {
@@ -178,21 +173,49 @@ const UploadMultipleFile = <T extends FileObject>({
     setErrors({})
   }
 
-  const handleRemoveFiles = (index: number) => {
-    if (index < initFiles.length) {
-      // Remove from files
-      const delFile = initFiles.find((_, i) => i === index)
+  const updateFileOrders = (allItems: TransformedImagesType[]) => {
+    const filteredInitFiles = initFiles.filter(initItem => allItems.some(item => item.fileName === fileName(initItem)))
+    const filteredUploadedFiles = uploadedFiles.filter(initItem =>
+      allItems.some(item => item.fileName === initItem.file.name)
+    )
+
+    allItems.forEach((item, index) => {
+      if (item.isDefaultFile) {
+        // Update order in initFiles
+        const initFileIndex = filteredInitFiles.findIndex(itemInit => fileName(itemInit) === item.fileName)
+        if (initFileIndex !== -1) {
+          filteredInitFiles[initFileIndex] = {
+            ...filteredInitFiles[initFileIndex],
+            [orderKey]: index
+          }
+        }
+      } else {
+        // Update order in uploadedFiles
+        const uploadedFileIndex = filteredUploadedFiles.findIndex(uploaded => uploaded.file.name === item.fileName)
+        if (uploadedFileIndex !== -1) {
+          filteredUploadedFiles[uploadedFileIndex] = {
+            ...filteredUploadedFiles[uploadedFileIndex],
+            order: index
+          }
+        }
+      }
+    })
+
+    setInitFiles(filteredInitFiles)
+    setUploadedFiles(filteredUploadedFiles)
+    onChangeOrderDefaultFiles(filteredInitFiles)
+  }
+
+  const handleRemoveFiles = (file: TransformedImagesType) => {
+    const allItems = transformedImages.filter(item => item.order !== file.order)
+    updateFileOrders(allItems)
+
+    if (file.isDefaultFile) {
+      const delFile = initFiles.find(item => item[orderKey] === file.order)
       if (delFile) {
         const delFileList = [...deleteFiles, delFile]
-        setDeleteFiles(delFileList)
-        const newFiles = initFiles.filter((_, i) => i !== index)
-        setInitFiles(newFiles)
         onRemoveDefaultFiles && onRemoveDefaultFiles(delFileList)
       }
-    } else {
-      // Remove from uploadedFiles
-      const newFiles = uploadedFiles.filter((_, i) => i !== index - initFiles.length)
-      setUploadedFiles(newFiles)
     }
   }
 
@@ -210,51 +233,15 @@ const UploadMultipleFile = <T extends FileObject>({
 
   const sensors = useSensors(mouseSensor, touchSensor)
 
-  // Handle sorting logic
   const handleDragEnd = (event: any) => {
     const { active, over } = event
 
     if (active.id !== over.id) {
-      // Get the old and new indices for all items
-      const allItems = [...transformedImages]
-      const oldIndex = allItems.findIndex(item => item.fileName === active.id)
-      const newIndex = allItems.findIndex(item => item.fileName === over.id)
+      const oldIndex = transformedImages.findIndex(item => item.fileName === active.id)
+      const newIndex = transformedImages.findIndex(item => item.fileName === over.id)
+      const newAllItems = arrayMove(transformedImages, oldIndex, newIndex)
 
-      // Rearrange the items in new order
-      const newAllItems = arrayMove(allItems, oldIndex, newIndex)
-      const newInitFiles: T[] = [...initFiles]
-      const newUploadedFiles: { order: number; file: File }[] = [...uploadedFiles]
-
-      // Update order for each item in newAllItems
-      newAllItems.forEach((item, index) => {
-        if (item.isDefaultFile) {
-          // Update order in initFiles
-          const initFileIndex = newInitFiles.findIndex(itemInit => fileName(itemInit) === item.fileName)
-          if (initFileIndex !== -1) {
-            newInitFiles[initFileIndex] = {
-              ...newInitFiles[initFileIndex],
-              [orderKey]: index
-            }
-          }
-        } else {
-          // Update order in uploadedFiles
-          const uploadedFileIndex = newUploadedFiles.findIndex(uploaded => uploaded.file.name === item.fileName)
-          if (uploadedFileIndex !== -1) {
-            newUploadedFiles[uploadedFileIndex] = {
-              ...newUploadedFiles[uploadedFileIndex],
-              order: index
-            }
-          }
-        }
-      })
-
-      // Update state
-      setInitFiles(newInitFiles)
-      setUploadedFiles(newUploadedFiles)
-
-      // Trigger callback if provided
-      onChangeOrderDefaultFilesDrag && onChangeOrderDefaultFilesDrag(newInitFiles)
-      onSelectFiles && onSelectFiles(newUploadedFiles)
+      updateFileOrders(newAllItems)
     }
   }
 
@@ -321,50 +308,33 @@ const UploadMultipleFile = <T extends FileObject>({
       />
 
       {/* Draggable and Sortable List */}
-      {isDrag ? (
-        <DndContext
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-          modifiers={[restrictToParentElement]}
-          sensors={sensors}>
-          <SortableContext
-            items={transformedImages.map(file => file.fileName || file.order?.toString())}
-            strategy={verticalListSortingStrategy}>
-            <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
-              {transformedImages.length > 0 &&
-                transformedImages.map((file, index) => (
-                  <SortableItem
-                    key={file.fileName || index.toString()}
-                    id={file.fileName || file.order?.toString()}
-                    index={index}
-                    file={file}
-                    initFiles={initFiles}
-                    onRemove={handleRemoveFiles}
-                    setIsOpen={setIsOpen}
-                    setStartingIndex={setStartingIndex}
-                  />
-                ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-      ) : (
-        <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
-          {transformedImages.length > 0 &&
-            transformedImages.map((file, index) => (
-              <SortableItem
-                key={file.fileName || index.toString()}
-                id={file.fileName || file.order?.toString()}
-                index={index}
-                file={file}
-                initFiles={initFiles}
-                onRemove={handleRemoveFiles}
-                setIsOpen={setIsOpen}
-                setStartingIndex={setStartingIndex}
-                disableDrag // Pass a prop to disable dragging interactions
-              />
-            ))}
-        </div>
-      )}
+      <DndContext
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToParentElement]}
+        sensors={sensors}>
+        <SortableContext
+          items={transformedImages.map(file => file.fileName || file.order?.toString())}
+          strategy={verticalListSortingStrategy}
+          disabled={!isDrag}>
+          <div className={cn('mt-5 flex flex-col gap-2', contentClassName)}>
+            {transformedImages.length > 0 &&
+              transformedImages.map((file, index) => (
+                <SortableItem
+                  key={file.fileName || index.toString()}
+                  id={file.fileName || file.order?.toString()}
+                  index={index}
+                  file={file}
+                  initFiles={initFiles}
+                  onRemove={() => handleRemoveFiles(file)}
+                  setIsOpen={setIsOpen}
+                  setStartingIndex={setStartingIndex}
+                  disabled={!isDrag}
+                />
+              ))}
+          </div>
+        </SortableContext>
+      </DndContext>
     </Fragment>
   )
 }

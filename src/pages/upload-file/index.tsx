@@ -72,12 +72,12 @@ const UploadFile = (props: Props) => {
 
       <Spacer y={5} />
       <UploadMultipleFile
+        isDrag={true}
+        orderKey='order'
         defaultFiles={items}
         srcImage={file => file.pathURL}
         fileName={file => file.fileName}
         fileSize={file => file.fileSize}
-        isDrag={true}
-        orderKey='order'
         onSelectFiles={value => {
           console.log('🚀 ~ onSelectFiles ~ value:', value)
           setUploadFiles(value.map(item => item.file))

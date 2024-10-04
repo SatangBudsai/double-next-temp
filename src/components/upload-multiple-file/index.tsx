@@ -47,6 +47,7 @@ interface UploadMultipleFileProps<T> {
   dropzoneClassName?: string
   contentClassName?: string
   dropzoneOptions?: DropzoneOptions
+  hiddenDropzone?: boolean
 }
 
 const UploadMultipleFile = <T extends FileObject>({
@@ -62,7 +63,8 @@ const UploadMultipleFile = <T extends FileObject>({
   dropzoneClassName,
   contentClassName,
   dropzoneContent,
-  dropzoneOptions
+  dropzoneOptions,
+  hiddenDropzone
 }: UploadMultipleFileProps<T>) => {
   const [errors, setErrors] = useState<ErrorCategory>({})
   const [initFiles, setInitFiles] = useState<T[]>([])
@@ -249,31 +251,32 @@ const UploadMultipleFile = <T extends FileObject>({
   return (
     <Fragment>
       {/* Dropzone Section Remains Unchanged */}
-      <Dropzone onDrop={handleUploadFiles} {...dropzoneOptions}>
-        {({ getRootProps, getInputProps, open }) => (
-          <section>
-            <div {...getRootProps()} className='w-full'>
-              <input {...getInputProps()} />
-              <div
-                className={cn(
-                  'flex flex-col items-center justify-center gap-2',
-                  'rounded-xl border-2 border-dashed border-default-200 text-default-500',
-                  'h-52 cursor-pointer py-5',
-                  dropzoneClassName
-                )}>
-                {dropzoneContent || (
-                  <Fragment>
-                    <Icon icon='lucide:upload' width={25} />
-                    <Button onClick={open}>Upload File</Button>
-                    <p className='text-sm'>or Drag and Drop</p>
-                  </Fragment>
-                )}
+      {!hiddenDropzone && (
+        <Dropzone onDrop={handleUploadFiles} {...dropzoneOptions}>
+          {({ getRootProps, getInputProps, open }) => (
+            <section>
+              <div {...getRootProps()} className='w-full'>
+                <input {...getInputProps()} />
+                <div
+                  className={cn(
+                    'flex flex-col items-center justify-center gap-2',
+                    'rounded-xl border-2 border-dashed border-default-200 text-default-500',
+                    'h-52 cursor-pointer py-5',
+                    dropzoneClassName
+                  )}>
+                  {dropzoneContent || (
+                    <Fragment>
+                      <Icon icon='lucide:upload' width={25} />
+                      <Button onClick={open}>Upload File</Button>
+                      <p className='text-sm'>or Drag and Drop</p>
+                    </Fragment>
+                  )}
+                </div>
               </div>
-            </div>
-          </section>
-        )}
-      </Dropzone>
-
+            </section>
+          )}
+        </Dropzone>
+      )}
       {/* Error Message Remains Unchanged */}
       {Object.keys(errors).length > 0 && (
         <div className='mt-2 rounded-lg bg-danger/10 p-5 text-danger'>

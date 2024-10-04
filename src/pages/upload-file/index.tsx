@@ -1,27 +1,19 @@
 import { Fragment, ReactElement, useState } from 'react'
 import { useTheme } from 'next-themes'
-import RootLayout from '@/layouts/root-layout'
 import MainLayout from '@/layouts/main-layout'
 import { DateRange } from 'react-day-picker'
-import Alert from '@/components/alert'
-import { Button, Input, Image, Spacer } from '@nextui-org/react'
 import useLoaderGlobal from '@/hooks/useLoaderGlobal'
-import DatePicker from '@/components/date-picker'
-import DateMultiplePicker from '@/components/date-multiple-picker'
-import DateRangePicker from '@/components/date-range-picker'
 import exampleSubService from '@/api/manual/sub-service/example'
-import { Controller, useForm } from 'react-hook-form'
-import { SlideshowLightbox } from 'lightbox.js-react'
 import { useTranslation } from 'react-i18next'
 import UploadMultipleFile from '@/components/upload-multiple-file'
-import UploadSingleFile from '@/components/upload-singer-file'
 import { convertToBytes } from '@/utils/upload-files/convertToBytes'
+import { Spacer } from '@nextui-org/react'
 
 type ItemsType = {
   pathURL: string
   fileName: string
   fileSize: number
-  order: number
+  orderNo: number
 }
 
 interface ProgressType {
@@ -33,20 +25,20 @@ const items: ItemsType[] = [
     pathURL: 'https://pixlr.com/images/generator/text-to-image.webp',
     fileName: 'text-to-image.webp',
     fileSize: 1000,
-    order: 0
+    orderNo: 0
   },
   {
     pathURL: 'https://fps.cdnpk.net/images/home/subhome-ai.webp?w=649&h=649',
     fileName: 'subhome-ai.webp',
     fileSize: 1500,
-    order: 1
+    orderNo: 1
   },
   {
     pathURL:
       'https://img.freepik.com/free-photo/abstract-autumn-beauty-multi-colored-leaf-vein-pattern-generated-by-ai_188544-9871.jpg',
     fileName: 'abstract-autumn-beauty-multi-colored-leaf-vein-pattern-generated-by-ai_188544-9871.jpg',
     fileSize: 2300,
-    order: 2
+    orderNo: 2
   }
 ]
 
@@ -81,9 +73,9 @@ const UploadFile = (props: Props) => {
         srcImage={file => file.pathURL}
         fileName={file => file.fileName}
         fileSize={file => file.fileSize}
-        groupUploadStatus={true}
-        isDrag={true}
-        orderKey='order'
+        // groupUploadStatus={true}
+        // isDrag={true}
+        // orderKey='order'
         onSelectFiles={value => {
           console.log('🚀 ~ onSelectFiles ~ value:', value)
           setUploadFiles(value.map(item => item.file))
@@ -92,10 +84,10 @@ const UploadFile = (props: Props) => {
           console.log('🚀 ~ onRemoveDefaultFiles ~ value:', value)
           setDefaultFilesRemove(value)
         }}
-        onChangeOrderDefaultFilesDrag={value => {
-          console.log('🚀 ~ onChangeOrderDefaultFilesDrag ~ value:', value)
-          setOrderDefaultFiles(value)
-        }}
+        // onChangeOrderDefaultFilesDrag={value => {
+        //   console.log('🚀 ~ onChangeOrderDefaultFilesDrag ~ value:', value)
+        //   setOrderDefaultFiles(value)
+        // }}
         dropzoneOptions={{
           maxFiles: 10,
           maxSize: convertToBytes({ size: 20, unit: 'MB' })

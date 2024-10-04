@@ -227,6 +227,26 @@ const UploadMultipleFile = <T extends FileObject>({
     }
   }
 
+  const handleRemoveFilesSortOrder = (file: TransformedImagesType) => {
+    if (file.isDefaultFile) {
+      // Remove file init
+      const findInitFileRemove = initFiles.find(item => item[orderKey] === file.order)
+      if (findInitFileRemove) {
+        const newDelFileList = [...deleteFiles, findInitFileRemove]
+        setDeleteFiles(newDelFileList)
+
+        const newInitFilesList = initFiles.filter(item => item[orderKey] !== file.order)
+        setInitFiles(newInitFilesList)
+
+        onRemoveDefaultFiles && onRemoveDefaultFiles(newDelFileList)
+      }
+    } else {
+      // Remove new Select
+      const newFiles = uploadedFiles.filter(item => item.order !== file.order)
+      setUploadedFiles(newFiles)
+    }
+  }
+
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
       distance: 10 // Drag will only activate if moved 10 pixels or more
@@ -379,7 +399,9 @@ const UploadMultipleFile = <T extends FileObject>({
                           index={index}
                           file={file}
                           initFiles={initFiles}
-                          onRemove={handleRemoveFiles}
+                          onRemove={() => {
+                            isDrag ? handleRemoveFilesSortOrder(file) : handleRemoveFiles(index)
+                          }}
                           setIsOpen={setIsOpen}
                           setStartingIndex={setStartingIndex}
                           disableDrag={!isDrag}
@@ -401,7 +423,9 @@ const UploadMultipleFile = <T extends FileObject>({
                           index={index}
                           file={file}
                           initFiles={initFiles}
-                          onRemove={handleRemoveFiles}
+                          onRemove={() => {
+                            isDrag ? handleRemoveFilesSortOrder(file) : handleRemoveFiles(index)
+                          }}
                           setIsOpen={setIsOpen}
                           setStartingIndex={setStartingIndex}
                           disableDrag={!isDrag}
@@ -422,7 +446,9 @@ const UploadMultipleFile = <T extends FileObject>({
                         index={index}
                         file={file}
                         initFiles={initFiles}
-                        onRemove={handleRemoveFiles}
+                        onRemove={() => {
+                          isDrag ? handleRemoveFilesSortOrder(file) : handleRemoveFiles(index)
+                        }}
                         setIsOpen={setIsOpen}
                         setStartingIndex={setStartingIndex}
                         disableDrag={!isDrag}

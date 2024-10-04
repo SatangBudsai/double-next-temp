@@ -39,7 +39,7 @@ interface UploadMultipleFileProps<T> {
   fileName?: (file: T) => string | undefined | null
   fileSize?: (file: T) => number | undefined | null
   orderKey: keyof T
-  isDrag?: boolean
+  isDrag: boolean
   onSelectFiles?: (files: { order: number; file: File }[]) => void
   onRemoveDefaultFiles?: (value: T[]) => void
   onChangeOrderDefaultFiles?: (value: T[]) => void
@@ -55,7 +55,7 @@ const UploadMultipleFile = <T extends FileObject>({
   fileName = file => file?.alt,
   fileSize = file => file?.fileSize,
   orderKey,
-  isDrag = false,
+  isDrag,
   onSelectFiles,
   onRemoveDefaultFiles,
   onChangeOrderDefaultFiles,
@@ -326,11 +326,10 @@ const UploadMultipleFile = <T extends FileObject>({
                   id={file.fileName || file.order?.toString()}
                   index={index}
                   file={file}
-                  initFiles={initFiles}
                   onRemove={() => handleRemoveFiles(file)}
                   setIsOpen={setIsOpen}
                   setStartingIndex={setStartingIndex}
-                  disabled={!isDrag}
+                  disableDrag={!isDrag}
                 />
               ))}
           </div>
@@ -340,17 +339,25 @@ const UploadMultipleFile = <T extends FileObject>({
   )
 }
 
-// SortableItem Component
+interface SortableItemProps {
+  id: string
+  index: number
+  file: TransformedImagesType
+  onRemove: () => void
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setStartingIndex: React.Dispatch<React.SetStateAction<number>>
+  disableDrag: boolean
+}
+
 const SortableItem = ({
   id,
   index,
   file,
-  initFiles,
   onRemove,
   setIsOpen,
   setStartingIndex,
-  disableDrag = false
-}: any) => {
+  disableDrag = true
+}: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -401,7 +408,7 @@ const SortableItem = ({
           </div>
         </div>
       </div>
-      <Button size='sm' color='danger' variant='bordered' isIconOnly onPress={() => onRemove(index)}>
+      <Button size='sm' color='danger' variant='bordered' isIconOnly onPress={() => onRemove()}>
         <Icon icon='solar:close-square-bold' width={20} />
       </Button>
     </div>

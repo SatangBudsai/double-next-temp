@@ -12,7 +12,7 @@ const appSettingSlice = createSlice({
   name: 'appSettingSlice',
   initialState,
   reducers: {
-    updateState: (state, action: PayloadAction<Props>) => ({
+    updateState: (state, action: PayloadAction<Partial<Props>>) => ({
       ...state,
       ...action.payload
     }),

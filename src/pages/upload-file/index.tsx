@@ -21,24 +21,28 @@ type ItemsType = {
   pathURL: string
   fileName: string
   fileSize: number
+  order: number
 }
 
 const items: ItemsType[] = [
   {
     pathURL: 'https://pixlr.com/images/generator/text-to-image.webp',
     fileName: 'text-to-image.webp',
-    fileSize: 1000
+    fileSize: 1000,
+    order: 0
   },
   {
     pathURL: 'https://fps.cdnpk.net/images/home/subhome-ai.webp?w=649&h=649',
     fileName: 'subhome-ai.webp',
-    fileSize: 1500
+    fileSize: 1500,
+    order: 1
   },
   {
     pathURL:
       'https://img.freepik.com/free-photo/abstract-autumn-beauty-multi-colored-leaf-vein-pattern-generated-by-ai_188544-9871.jpg',
     fileName: 'abstract-autumn-beauty-multi-colored-leaf-vein-pattern-generated-by-ai_188544-9871.jpg',
-    fileSize: 2300
+    fileSize: 2300,
+    order: 2
   }
 ]
 
@@ -59,7 +63,8 @@ const UploadFile = (props: Props) => {
   }
 
   const [uploadFiles, setUploadFiles] = useState<File[]>([])
-  const [defaultFiles, setDefaultFiles] = useState<ItemsType[]>([])
+  const [defaultFilesRemove, setDefaultFilesRemove] = useState<ItemsType[]>([])
+  const [orderDefaultFiles, setOrderDefaultFiles] = useState<ItemsType[]>([])
 
   return (
     <Fragment>
@@ -67,20 +72,29 @@ const UploadFile = (props: Props) => {
 
       <Spacer y={5} />
       <UploadMultipleFile
+        isDrag={true}
+        orderKey='order'
         defaultFiles={items}
         srcImage={file => file.pathURL}
         fileName={file => file.fileName}
         fileSize={file => file.fileSize}
-        onFilesSelect={files => {
-          setUploadFiles(files)
+        onSelectFiles={value => {
+          console.log('🚀 ~ onSelectFiles ~ value:', value)
+          setUploadFiles(value.map(item => item.file))
         }}
-        onDefaultFilesRemove={files => {
-          setDefaultFiles(files)
+        onRemoveDefaultFiles={value => {
+          console.log('🚀 ~ onRemoveDefaultFiles ~ value:', value)
+          setDefaultFilesRemove(value)
+        }}
+        onChangeOrderDefaultFiles={value => {
+          console.log('🚀 ~ onChangeOrderDefaultFilesDrag ~ value:', value)
+          setOrderDefaultFiles(value)
         }}
         dropzoneOptions={{
           maxFiles: 10,
-          maxSize: convertToBytes({ unit: 'MB', size: 1 })
+          maxSize: convertToBytes({ size: 100, unit: 'MB' })
         }}
+        maxTotalSize={convertToBytes({ size: 10, unit: 'MB' })}
       />
     </Fragment>
   )

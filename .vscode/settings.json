@@ -8,6 +8,7 @@
     ".env.*": "env"
   },
   "cSpell.words": [
+    "akar",
     "clsx",
     "hugeicons",
     "iconify",

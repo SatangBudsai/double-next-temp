@@ -12,7 +12,7 @@ const loaderSlice = createSlice({
   name: 'loaderSlice',
   initialState,
   reducers: {
-    updateState: (state, action: PayloadAction<Props>) => ({
+    updateState: (state, action: PayloadAction<Partial<Props>>) => ({
       ...state,
       ...action.payload
     }),

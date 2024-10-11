@@ -208,6 +208,12 @@ const Home = (props: Props) => {
         showThumbnails={true}
         images={productsCafe}
         modalClose={'clickOutside'}
+        onOpen={() => {
+          document.body.classList.add('overflow-y-hidden')
+        }}
+        onClose={() => {
+          document.body.classList.remove('overflow-y-hidden')
+        }}
         className='grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8'>
         {productsCafe.map(product => (
           <div key={product.id}>

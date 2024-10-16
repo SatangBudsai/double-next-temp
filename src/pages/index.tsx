@@ -74,11 +74,11 @@ type Props = {}
 
 const Home = (props: Props) => {
   const loaderGlobal = useLoaderGlobal()
+  const { t } = useTranslation()
   const { theme, setTheme } = useTheme()
   const [date, setDate] = useState<Date | undefined>()
   const [arrDate, setArrDate] = useState<Date[] | undefined>()
   const [rangeDate, setRangeDate] = useState<DateRange | undefined>()
-  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'common' })
 
   const getApi = async () => {
     loaderGlobal.start()
@@ -93,7 +93,7 @@ const Home = (props: Props) => {
     <Fragment>
       <div className='flex flex-col gap-5'>
         <div className='flex flex-wrap items-center justify-center gap-5'>Template NextJs and NextUI</div>
-        <div className='flex justify-center'>{tCommon('hello')}</div>
+        <div className='flex justify-center'>{t('common.hello')}</div>
 
         <Button variant='flat' color='primary' onClick={getApi}>
           Call API

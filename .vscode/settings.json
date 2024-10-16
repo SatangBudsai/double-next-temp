@@ -22,5 +22,8 @@
     "tailwindcss",
     "tanstack",
     "usehooks"
-  ]
+  ],
+  "i18n-ally.localesPaths": ["src/configs/translations/**"],
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.annotations": false
 }

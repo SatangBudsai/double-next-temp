@@ -12,7 +12,7 @@ type Props = {
 }
 
 const RootLayout = (props: Props) => {
-  const loaderState = useSelector((state: StateType) => state.loaderState)
+  const loadingScreenReducer = useSelector((state: StateType) => state.loadingScreenReducer)
 
   return (
     <Fragment>
@@ -24,7 +24,7 @@ const RootLayout = (props: Props) => {
         <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
       </Head>
       <main>
-        <LoadingScreen isLoading={loaderState.loader > 0} />
+        <LoadingScreen isLoading={loadingScreenReducer.loadingList.length > 0} />
         {props.children}
       </main>
     </Fragment>

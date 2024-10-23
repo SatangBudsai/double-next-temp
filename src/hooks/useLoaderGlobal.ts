@@ -1,14 +1,33 @@
-import { loaderAction } from '@/store/reducers/loader'
+import store from '@/store'
+import { loadingScreenAction } from '@/store/reducers/loading-screen'
 import { useDispatch } from 'react-redux'
 
-const useLoaderGlobal = () => {
+const useLoadingScreen = () => {
   const dispatch = useDispatch()
 
-  const start = () => {
-    dispatch(loaderAction.startLoader())
+  const getLoadingList = () => {
+    return store.getState().loadingScreenReducer.loadingList
   }
-  const stop = () => {
-    dispatch(loaderAction.stopLoader())
+
+  const start = (props: { key: string }) => {
+    const loadingList = getLoadingList()
+    if (!loadingList.includes(props.key)) {
+      dispatch(
+        loadingScreenAction.updateState({
+          loadingList: [...loadingList, props.key]
+        })
+      )
+    }
+  }
+
+  const stop = (props: { key: string }) => {
+    const loadingList = getLoadingList()
+    const updatedList = loadingList.filter(loadingKey => loadingKey !== props.key)
+    dispatch(
+      loadingScreenAction.updateState({
+        loadingList: updatedList
+      })
+    )
   }
 
   return {
@@ -17,4 +36,4 @@ const useLoaderGlobal = () => {
   }
 }
 
-export default useLoaderGlobal
+export default useLoadingScreen

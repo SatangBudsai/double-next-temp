@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux'
-import { loaderReducer } from './reducers/loader'
+import { loadingScreenReducer } from './reducers/loading-screen'
 import { appSettingReducer } from './reducers/app-setting'
 import { socketReducer } from './reducers/socket'
 
 const rootReducer = combineReducers({
-  loaderState: loaderReducer,
-  appSettingState: appSettingReducer,
-  socketState: socketReducer
+  loadingScreenReducer,
+  appSettingReducer,
+  socketReducer
 })
 export default rootReducer

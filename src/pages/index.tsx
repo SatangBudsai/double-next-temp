@@ -15,6 +15,7 @@ import { SlideshowLightbox } from 'lightbox.js-react'
 import { useTranslation } from 'react-i18next'
 import UploadMultipleFile from '@/components/upload-multiple-file'
 import UploadSingleFile from '@/components/upload-singer-file'
+import useLoadingScreen from '@/hooks/useLoaderGlobal'
 
 type ItemsType = {
   pathURL: string
@@ -73,17 +74,16 @@ const productsCafe = [
 type Props = {}
 
 const Home = (props: Props) => {
-  const loaderGlobal = useLoaderGlobal()
-  const { t } = useTranslation()
+  const loadingScreen = useLoadingScreen()
   const { theme, setTheme } = useTheme()
   const [date, setDate] = useState<Date | undefined>()
   const [arrDate, setArrDate] = useState<Date[] | undefined>()
   const [rangeDate, setRangeDate] = useState<DateRange | undefined>()
 
   const getApi = async () => {
-    loaderGlobal.start()
+    loadingScreen.start({ key: 'home' })
     exampleSubService.getExample()
-    loaderGlobal.stop()
+    loadingScreen.stop({ key: 'home' })
   }
 
   const [uploadFiles, setUploadFiles] = useState<File[]>([])

@@ -5,7 +5,6 @@ import MainLayout from '@/layouts/main-layout'
 import { DateRange } from 'react-day-picker'
 import Alert from '@/components/alert'
 import { Button, Input, Image, Spacer } from '@nextui-org/react'
-import useLoaderGlobal from '@/hooks/useLoaderGlobal'
 import DatePicker from '@/components/date-picker'
 import DateMultiplePicker from '@/components/date-multiple-picker'
 import DateRangePicker from '@/components/date-range-picker'
@@ -15,7 +14,7 @@ import { SlideshowLightbox } from 'lightbox.js-react'
 import { useTranslation } from 'react-i18next'
 import UploadMultipleFile from '@/components/upload-multiple-file'
 import UploadSingleFile from '@/components/upload-singer-file'
-import useLoadingScreen from '@/hooks/useLoaderGlobal'
+import useLoadingScreen from '@/hooks/useLoadingScreen'
 
 type ItemsType = {
   pathURL: string
@@ -74,6 +73,7 @@ const productsCafe = [
 type Props = {}
 
 const Home = (props: Props) => {
+  const { t } = useTranslation()
   const loadingScreen = useLoadingScreen()
   const { theme, setTheme } = useTheme()
   const [date, setDate] = useState<Date | undefined>()

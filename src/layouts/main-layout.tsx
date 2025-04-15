@@ -1,13 +1,14 @@
 'use client'
 
 import React, { ReactNode } from 'react'
-import { Card } from '@nextui-org/react'
+import { Card } from '@heroui/react'
 import { useMediaQuery } from 'usehooks-ts'
 import Sidebar from './partial/sidebar'
 import Navbar from './partial/navbar'
 import { cn } from '@/utils/cn'
 import configLayout from '@/layouts/config-layout.json'
 import useBreakpoint from '@/hooks/useBreakpoint'
+import Footer from './partial/footer'
 
 type Props = {
   children: ReactNode
@@ -27,8 +28,9 @@ export default function MainLayout(props: Props) {
             <Sidebar />
           </Card>
         )}
-        <section className='flex flex-1'>
-          <div className='flex flex-1 flex-col p-10 max-sm:px-3 max-sm:pb-5 max-sm:pt-6'>{props.children}</div>
+        <section className='flex flex-1 flex-col'>
+          <div className='flex flex-1 flex-col px-7 pt-7 max-sm:px-3 max-sm:pb-5 max-sm:pt-6'>{props.children}</div>
+          <Footer />
         </section>
       </section>
     </div>

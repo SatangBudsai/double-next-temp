@@ -1,7 +1,7 @@
 import { StateType } from '@/store'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Avatar, Button, ScrollShadow, Spacer, Tooltip } from '@nextui-org/react'
+import { Avatar, Button, ScrollShadow, Spacer, Tooltip } from '@heroui/react'
 import { cn } from '@/utils/cn'
 import SidebarMenu from './sidebar-menu'
 import useSectionItems from './sidebar-items'
@@ -9,6 +9,9 @@ import { Icon } from '@iconify/react/dist/iconify.js'
 import configLayout from '@/layouts/config-layout.json'
 import { useTheme } from 'next-themes'
 import useBreakpoint from '@/hooks/useBreakpoint'
+import { mainService } from '@/api/generated/main-service'
+import Cookies from 'js-cookie'
+import { useRouter } from 'next/router'
 
 type Props = {
   disableIsCompact?: boolean
@@ -16,11 +19,12 @@ type Props = {
 
 const Sidebar = (props: Props) => {
   const sectionItems = useSectionItems()
-  const appSettingState = useSelector((state: StateType) => state.appSettingState)
+  const appSettingReducer = useSelector((state: StateType) => state.appSettingState)
   const { isMobile, isIpad } = useBreakpoint()
   const { setTheme, theme } = useTheme()
+  const router = useRouter()
 
-  const isCompact = props.disableIsCompact ? false : appSettingState.isCompact || isIpad
+  const isCompact = props.disableIsCompact ? false : appSettingReducer.isCompact || isIpad
 
   const handleChangeTheme = () => {
     if (theme === 'light') {
@@ -41,8 +45,8 @@ const Sidebar = (props: Props) => {
         </div>
       )}
 
-      <div className='mt-5 flex items-center gap-3 px-3'>
-        <Avatar isBordered className='flex-none text-default-600' size='sm' />
+      <div className='mt-3 flex items-center gap-3 px-3'>
+        <Avatar radius='md' isBordered className='flex-none text-default-600' size='sm' />
         <div className={cn('flex max-w-full flex-col', { hidden: isCompact })}>
           <p className='truncate text-small font-medium text-default-600'>FirstName LastName</p>
           <p className='truncate text-tiny text-default-400'>ผู้ดูแลระบบ</p>
@@ -80,10 +84,12 @@ const Sidebar = (props: Props) => {
             })}
             isIconOnly={isCompact}
             startContent={
-              isCompact ? null : <Icon icon='solar:logout-3-linear' className='flex-none text-default-500' width={24} />
+              isCompact ? null : (
+                <Icon icon='solar:logout-2-outline' className='flex-none text-default-500' width={24} />
+              )
             }
             variant='light'>
-            {isCompact ? <Icon icon='solar:logout-3-linear' className='text-default-500' width={24} /> : 'ออกจากระบบ'}
+            {isCompact ? <Icon icon='solar:logout-2-outline' className='text-default-500' width={24} /> : 'ออกจากระบบ'}
           </Button>
         </Tooltip>
       </div>

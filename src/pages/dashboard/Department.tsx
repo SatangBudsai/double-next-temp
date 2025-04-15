@@ -1,4 +1,4 @@
-import { Spacer } from '@nextui-org/react'
+import { Spacer } from "@heroui/react"
 import React, { Fragment } from 'react'
 
 type Props = {}

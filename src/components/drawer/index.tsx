@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@nextui-org/react'
+import { cn } from "@heroui/react"
 import { ReactNode, CSSProperties } from 'react'
 
 import ModernDrawer from 'react-modern-drawer'

@@ -4,7 +4,7 @@ import RootLayout from '@/layouts/root-layout'
 import MainLayout from '@/layouts/main-layout'
 import { DateRange } from 'react-day-picker'
 import Alert from '@/components/alert'
-import { Button, Input, Image, Spacer } from '@nextui-org/react'
+import { Button, Input, Image, Spacer } from '@heroui/react'
 import DatePicker from '@/components/date-picker'
 import DateMultiplePicker from '@/components/date-multiple-picker'
 import DateRangePicker from '@/components/date-range-picker'
@@ -14,7 +14,7 @@ import { SlideshowLightbox } from 'lightbox.js-react'
 import { useTranslation } from 'react-i18next'
 import UploadMultipleFile from '@/components/upload-multiple-file'
 import UploadSingleFile from '@/components/upload-singer-file'
-import useLoadingScreen from '@/hooks/useLoadingScreen'
+import useLoadingScreen from '@/hooks/useLoaderGlobal'
 
 type ItemsType = {
   pathURL: string
@@ -95,13 +95,13 @@ const Home = (props: Props) => {
         <div className='flex flex-wrap items-center justify-center gap-5'>Template NextJs and NextUI</div>
         <div className='flex justify-center'>{t('common.hello')}</div>
 
-        <Button variant='flat' color='primary' onClick={getApi}>
+        <Button variant='flat' color='primary' onPress={getApi}>
           Call API
         </Button>
         <div className='grid grid-cols-6 gap-5 max-md:grid-cols-2'>
           <Button
             color='primary'
-            onClick={() =>
+            onPress={() =>
               Alert.message({
                 content: 'Open Message',
                 noButton: true
@@ -112,7 +112,7 @@ const Home = (props: Props) => {
 
           <Button
             color='secondary'
-            onClick={() =>
+            onPress={() =>
               Alert.message({
                 content: 'Open Message',
                 noButton: true,
@@ -124,7 +124,7 @@ const Home = (props: Props) => {
 
           <Button
             color='danger'
-            onClick={() =>
+            onPress={() =>
               Alert.error({
                 content: 'Open Error'
               })
@@ -134,7 +134,7 @@ const Home = (props: Props) => {
 
           <Button
             color='warning'
-            onClick={() =>
+            onPress={() =>
               Alert.warning({
                 content: 'Open warning'
               })
@@ -144,7 +144,7 @@ const Home = (props: Props) => {
 
           <Button
             color='success'
-            onClick={() =>
+            onPress={() =>
               Alert.success({
                 content: 'Open success'
               })
@@ -154,7 +154,7 @@ const Home = (props: Props) => {
 
           <Button
             color='default'
-            onClick={() =>
+            onPress={() =>
               Alert.question({
                 content: 'Open Question',
                 color: 'default'

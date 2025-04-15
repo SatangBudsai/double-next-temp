@@ -1,7 +1,7 @@
 import MainLayout from '@/layouts/main-layout'
 import RootLayout from '@/layouts/root-layout'
 import React, { Fragment, ReactElement } from 'react'
-import { Select, SelectItem, Spacer } from '@nextui-org/react'
+import { Select, SelectItem, Spacer } from "@heroui/react"
 import BarChart from './BarChart'
 import PieChart from './PieChart'
 import Department from './Department'

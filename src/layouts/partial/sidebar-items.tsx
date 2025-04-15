@@ -1,6 +1,6 @@
 import { type SidebarItem } from './sidebar-menu'
 import TeamAvatar from './team-avatar'
-import { Chip } from '@nextui-org/react'
+import { Chip } from '@heroui/react'
 
 const useSectionItems = () => {
   const data = () => {

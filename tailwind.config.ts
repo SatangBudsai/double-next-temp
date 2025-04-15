@@ -1,12 +1,12 @@
 /** @type {import('tailwindcss').Config} */
-const { nextui } = require('@nextui-org/react')
+const { heroui } = require("@heroui/react")
 const themeLight = require('./src/theme/colors/light')
 const themeDark = require('./src/theme/colors/dark')
 import { Config } from 'tailwindcss'
 
 const config: Config = {
   mode: 'jit',
-  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}', './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}'],
+  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}', "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {},
     screens: {
@@ -19,7 +19,7 @@ const config: Config = {
   },
   darkMode: 'class',
   plugins: [
-    nextui({
+    heroui({
       addCommonColors: true,
       themes: {
         light: themeLight,

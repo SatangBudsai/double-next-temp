@@ -1,6 +1,6 @@
 import { cn } from '@/utils/cn'
 import { Icon } from '@iconify/react'
-import { Button, Image } from '@nextui-org/react'
+import { Button, Image } from '@heroui/react'
 import { SlideshowLightbox } from 'lightbox.js-react'
 import React, { useState, useEffect, Fragment, useMemo } from 'react'
 import Dropzone, { DropzoneOptions } from 'react-dropzone'
@@ -89,7 +89,7 @@ const UploadSingleFile = <T extends FileObject>({
                     'aspect-square h-40 cursor-pointer object-cover py-5 '
                   )}>
                   <Icon icon='lucide:upload' width={25} />
-                  <Button onClick={open}>Upload File</Button>
+                  <Button onPress={open}>Upload File</Button>
                   <p className='text-sm'>or Drag and Drop</p>
                 </div>
               </div>

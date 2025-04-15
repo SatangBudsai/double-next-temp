@@ -12,8 +12,7 @@ type Props = {
 }
 
 const RootLayout = (props: Props) => {
-  const loadingScreenReducer = useSelector((state: StateType) => state.loadingScreenReducer)
-
+  const loadingScreenReducer = useSelector((state: StateType) => state.loaderState)
   return (
     <Fragment>
       <Head>

@@ -4,8 +4,8 @@ import RootLayout from '@/layouts/root-layout'
 import MainLayout from '@/layouts/main-layout'
 import { DateRange } from 'react-day-picker'
 import Alert from '@/components/alert'
-import { Button, Input, Image, Spacer } from '@nextui-org/react'
-import useLoaderGlobal from '@/hooks/useLoadingScreen'
+import { Button, Input, Image, Spacer } from '@heroui/react'
+import useLoaderGlobal from '@/hooks/useLoaderGlobal'
 import DatePicker from '@/components/date-picker'
 import DateMultiplePicker from '@/components/date-multiple-picker'
 import DateRangePicker from '@/components/date-range-picker'
@@ -56,11 +56,11 @@ const UploadFile = (props: Props) => {
   const [rangeDate, setRangeDate] = useState<DateRange | undefined>()
   const { t: tCommon } = useTranslation('translation', { keyPrefix: 'common' })
 
-  const getApi = async () => {
-    loaderGlobal.start()
-    exampleSubService.getExample()
-    loaderGlobal.stop()
-  }
+  // const getApi = async () => {
+  //   loaderGlobal.start()
+  //   exampleSubService.getExample()
+  //   loaderGlobal.stop()
+  // }
 
   const [uploadFiles, setUploadFiles] = useState<File[]>([])
   const [defaultFilesRemove, setDefaultFilesRemove] = useState<ItemsType[]>([])

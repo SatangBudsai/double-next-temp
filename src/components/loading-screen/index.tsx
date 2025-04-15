@@ -1,6 +1,6 @@
 import React from 'react'
-import { Modal, ModalContent } from '@nextui-org/react'
-import { Spinner } from '@nextui-org/react'
+import { Modal, ModalContent } from '@heroui/react'
+import { Spinner } from '@heroui/react'
 
 type Props = {
   isLoading: boolean

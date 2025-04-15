@@ -1,6 +1,6 @@
 import { cn } from '@/utils/cn'
 import { Icon } from '@iconify/react'
-import { Button, Image } from '@nextui-org/react'
+import { Button, Image } from '@heroui/react'
 import { SlideshowLightbox } from 'lightbox.js-react'
 import React, { useState, useEffect, Fragment, useMemo } from 'react'
 import Dropzone, { DropzoneOptions, FileRejection } from 'react-dropzone'
@@ -286,7 +286,7 @@ const UploadMultipleFile = <T extends FileObject>({
                   {dropzoneContent || (
                     <Fragment>
                       <Icon icon='lucide:upload' width={25} />
-                      <Button onClick={open}>Upload File</Button>
+                      <Button onPress={open}>Upload File</Button>
                       <p className='text-sm'>or Drag and Drop</p>
                     </Fragment>
                   )}

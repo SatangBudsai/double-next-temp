@@ -1,6 +1,6 @@
 import { cn } from '@/utils/cn'
 import { Icon } from '@iconify/react/dist/iconify.js'
-import { Select, SelectItem, Spacer } from '@nextui-org/react'
+import { Select, SelectItem, Spacer } from "@heroui/react"
 import React, { Fragment } from 'react'
 
 type Props = {}

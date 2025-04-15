@@ -1,17 +1,11 @@
 'use client'
 
-import {
-  Accordion,
-  AccordionItem,
-  type ListboxProps,
-  type ListboxSectionProps,
-  type Selection
-} from '@nextui-org/react'
+import { Accordion, AccordionItem, type ListboxProps, type ListboxSectionProps, type Selection } from '@heroui/react'
 import React from 'react'
-import { Listbox, Tooltip, ListboxItem, ListboxSection } from '@nextui-org/react'
-import { Icon } from '@iconify/react'
+import { Listbox, Tooltip, ListboxItem, ListboxSection } from '@heroui/react'
 import { cn } from '@/utils/cn'
 import { useRouter } from 'next/router'
+import Icon from '@/components/icon'
 
 export enum SidebarItemType {
   Nest = 'nest'
@@ -83,7 +77,6 @@ const SidebarMenu = React.forwardRef<HTMLElement, SidebarProps>(
         const isNestType = item.items && item.items?.length > 0 && item?.type === SidebarItemType.Nest
 
         if (isNestType) {
-          // Is a nest type item , so we need to remove the href
           delete item.href
         }
 
@@ -179,6 +172,8 @@ const SidebarMenu = React.forwardRef<HTMLElement, SidebarProps>(
 
     const renderItem = React.useCallback(
       (item: SidebarItem) => {
+        const { href, ...restItemProps } = item
+
         const isNestType = item.items && item.items?.length > 0 && item?.type === SidebarItemType.Nest
 
         if (isNestType) {
@@ -187,8 +182,9 @@ const SidebarMenu = React.forwardRef<HTMLElement, SidebarProps>(
 
         return (
           <ListboxItem
-            {...item}
+            {...restItemProps}
             key={item.key}
+            onPress={() => href && router.push(href)}
             endContent={isCompact || hideEndContent ? null : item.endContent ?? null}
             startContent={
               isCompact ? null : item.icon ? (
@@ -229,16 +225,14 @@ const SidebarMenu = React.forwardRef<HTMLElement, SidebarProps>(
       let itemActive: string | undefined = undefined
 
       items.map(item => {
-        if (item.items && item.items?.length > 0 && item?.type === SidebarItemType.Nest) {
-          // condition return
-        } else if (item.items && item.items?.length > 0) {
-          item.items.map(item2 => {
-            if (item2 && item2.href === path) {
-              itemActive = item2.key
+        if (item.items && item.items.length > 0) {
+          item.items.forEach(subItem => {
+            if (subItem.href && path.startsWith(subItem.href)) {
+              itemActive = subItem.key
             }
           })
         } else {
-          if (item.href === path) {
+          if (item.href && path.startsWith(item.href)) {
             itemActive = item.key
           }
         }
@@ -262,7 +256,7 @@ const SidebarMenu = React.forwardRef<HTMLElement, SidebarProps>(
         color='default'
         itemClasses={{
           ...itemClasses,
-          base: cn('px-3 min-h-11 rounded-large h-[44px] data-[selected=true]:bg-default-100', itemClasses?.base),
+          base: cn('px-3 min-h-11 rounded-large h-[44px] data-[selected=true]:bg-default-200/50', itemClasses?.base),
           title: cn(
             'text-small font-medium text-default-500 group-data-[selected=true]:text-foreground',
             itemClasses?.title

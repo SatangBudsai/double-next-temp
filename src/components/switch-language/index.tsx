@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Button } from '@nextui-org/react'
+import { Button } from '@heroui/react'
 import { useTranslation } from 'react-i18next'
 
 const SwitchLanguage = () => {
@@ -20,7 +20,7 @@ const SwitchLanguage = () => {
         isIconOnly
         color='primary'
         variant='light'
-        onClick={() => handleLangItemClick(currentLang === 'th' ? 'en' : 'th')}>
+        onPress={() => handleLangItemClick(currentLang === 'th' ? 'en' : 'th')}>
         {currentLang === 'th' ? 'EN' : 'TH'}
       </Button>
     </div>

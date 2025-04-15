@@ -4,7 +4,7 @@ import { Fragment } from 'react'
 import { Icon } from '@iconify/react'
 import dayjs from 'dayjs'
 import { DateRange, DayPicker } from 'react-day-picker'
-import { Input, Popover, PopoverContent, PopoverTrigger } from '@nextui-org/react'
+import { Input, Popover, PopoverContent, PopoverTrigger } from "@heroui/react"
 import { useEffect, useState } from 'react'
 import Calendar from '../calendar'
 

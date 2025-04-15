@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Icon } from '@iconify/react'
 import { DayPicker, DropdownProps } from 'react-day-picker'
 import dayjs from 'dayjs'
-import { Select, SelectItem, cn } from '@nextui-org/react'
+import { Select, SelectItem, cn } from '@heroui/react'
 
 const formatCaption = (date: Date) => {
   const y = dayjs(date).format('YYYY')
@@ -80,7 +80,6 @@ const Calendar = ({ className, classNames, showOutsideDays = true, ...props }: C
             } as React.ChangeEvent<HTMLSelectElement>
             onChange?.(changeEvent)
           }
-          console.log('value', value)
 
           return (
             <Select
@@ -95,9 +94,7 @@ const Calendar = ({ className, classNames, showOutsideDays = true, ...props }: C
               }}
               className='mx-1 w-28'>
               {options.map(option => (
-                <SelectItem key={`${option.props.value}`} value={option.props.value}>
-                  {option.props.children}
-                </SelectItem>
+                <SelectItem key={`${option.props.value}`}>{option.props.children}</SelectItem>
               ))}
             </Select>
           )

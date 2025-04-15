@@ -6,7 +6,7 @@ const useLoadingScreen = () => {
   const dispatch = useDispatch()
 
   const getLoadingList = () => {
-    return store.getState().loadingScreenReducer.loadingList
+    return store.getState().loaderState.loadingList
   }
 
   const start = (props: { key: string }) => {

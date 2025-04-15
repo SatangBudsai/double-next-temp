@@ -5,7 +5,7 @@ import { Icon } from '@iconify/react'
 import dayjs from 'dayjs'
 import { DayPicker } from 'react-day-picker'
 import Calendar from '../calendar'
-import { Input, Popover, PopoverContent, PopoverTrigger } from '@nextui-org/react'
+import { Input, Popover, PopoverContent, PopoverTrigger } from "@heroui/react"
 
 type Props = {
   mode: 'single'

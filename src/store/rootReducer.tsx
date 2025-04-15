@@ -4,8 +4,8 @@ import { appSettingReducer } from './reducers/app-setting'
 import { socketReducer } from './reducers/socket'
 
 const rootReducer = combineReducers({
-  loadingScreenReducer,
-  appSettingReducer,
-  socketReducer
+  loaderState: loadingScreenReducer,
+  appSettingState: appSettingReducer,
+  socketState: socketReducer
 })
 export default rootReducer

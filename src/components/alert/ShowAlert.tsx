@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import { Button, Modal, ModalBody, ModalContent, useDisclosure, cn } from '@nextui-org/react'
+import { Button, Modal, ModalBody, ModalContent, useDisclosure, cn } from '@heroui/react'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { createRoot } from 'react-dom/client'
 
@@ -75,12 +75,12 @@ const Alert = (props: ShowAlertProps & ButtonCancle & ButtonSubmit) => {
             {!noButton && (
               <div className='flex gap-2'>
                 {labelCancle && (
-                  <Button color={color} variant='bordered' onClick={handleCancle}>
+                  <Button color={color} variant='bordered' onPress={handleCancle}>
                     {labelCancle}
                   </Button>
                 )}
                 {labelSubmit && (
-                  <Button color={color} onClick={handleSubmit}>
+                  <Button color={color} onPress={handleSubmit}>
                     {labelSubmit}
                   </Button>
                 )}

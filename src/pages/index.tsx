@@ -86,6 +86,12 @@ const Home = (props: Props) => {
     loadingScreen.stop({ key: 'home' })
   }
 
+  console.log('hello')
+
+  console.info('test log info--')
+  console.error('test log error---')
+  console.warn('test log warn--')
+
   const [uploadFiles, setUploadFiles] = useState<File[]>([])
   const [defaultFiles, setDefaultFiles] = useState<ItemsType[]>([])
 

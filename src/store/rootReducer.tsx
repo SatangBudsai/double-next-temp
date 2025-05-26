@@ -5,7 +5,7 @@ import { socketReducer } from './reducers/socket'
 
 const rootReducer = combineReducers({
   loadingScreenReducer,
-  appSettingReducer,
-  socketReducer
+  appSettingState: appSettingReducer,
+  socketState: socketReducer
 })
 export default rootReducer

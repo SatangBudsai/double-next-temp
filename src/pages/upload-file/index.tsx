@@ -57,9 +57,9 @@ const UploadFile = (props: Props) => {
   const { t: tCommon } = useTranslation('translation', { keyPrefix: 'common' })
 
   const getApi = async () => {
-    loaderGlobal.start()
+    loaderGlobal.start({ key: 'zz' })
     exampleSubService.getExample()
-    loaderGlobal.stop()
+    loaderGlobal.stop({ key: 'zz' })
   }
 
   const [uploadFiles, setUploadFiles] = useState<File[]>([])
